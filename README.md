@@ -9,7 +9,7 @@ This project aims to avoid repetitive copy, paste & re-opening when making a cod
 
 Written in C++14 with MSVC 2015 Update 3 Community.
 
-* [Nana C++ Library](http://nanapro.org/en-us/) 1.5.3
+* [Nana C++ Library](http://nanapro.org/en-us/) 1.5.4
 * [Boost C++ Libraries](http://www.boost.org/) 1.64.0
 
 ## Downloads
