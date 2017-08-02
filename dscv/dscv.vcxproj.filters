@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\gui">
+      <UniqueIdentifier>{860abf41-0dab-4d5e-a8e3-8c8b20bd0004}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\gui">
+      <UniqueIdentifier>{ea1f63ea-a690-413b-b0c6-a095c7cda3b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\gui\widgets">
+      <UniqueIdentifier>{1841ac9c-4d9f-47ff-ab7f-8f0f96b34d17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\gui\widgets">
+      <UniqueIdentifier>{eba446ea-55a3-4a4e-b721-a206ffa62de4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\gui\about_window">
+      <UniqueIdentifier>{0636e8e0-2040-4bd4-8e40-e2de897f6a5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\gui\about_window">
+      <UniqueIdentifier>{51a96771-799f-4e89-80e4-828d3d0a0273}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\gui\judge_page">
+      <UniqueIdentifier>{d5e9e83e-305f-4c79-b70a-6a9a61431d40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\gui\judge_page">
+      <UniqueIdentifier>{1a8d2458-949c-4c4b-9c67-f46a970ee8c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\gui\widgets\detail">
+      <UniqueIdentifier>{822c9795-44e6-483b-9e78-f58c189fd5c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\gui\widgets\detail">
+      <UniqueIdentifier>{8da540f4-f4f3-4429-aac6-ef801efcfd80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\judge">
+      <UniqueIdentifier>{7a22d6da-a572-46e4-a1e8-2b92ff665f18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\judge">
+      <UniqueIdentifier>{1de6b630-3018-4ddf-90fd-4a1fe15ee333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\misc">
+      <UniqueIdentifier>{cc70f041-5f2a-44e9-81f9-70d6ef956203}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\main_window.cpp">
+      <Filter>소스 파일\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\about_window.cpp">
+      <Filter>소스 파일\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\about_window\license_box.cpp">
+      <Filter>소스 파일\gui\about_window</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\judge_page.cpp">
+      <Filter>소스 파일\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\judge_page\test_case_box.cpp">
+      <Filter>소스 파일\gui\judge_page</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\code_textbox.cpp">
+      <Filter>소스 파일\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\test_window.cpp">
+      <Filter>소스 파일\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\detail\hack_textbox.cpp">
+      <Filter>소스 파일\gui\widgets\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\judge_page\test_stream_box.cpp">
+      <Filter>소스 파일\gui\judge_page</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\scroll_panel.cpp">
+      <Filter>소스 파일\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\page_base.cpp">
+      <Filter>소스 파일\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="judge\judge_process.cpp">
+      <Filter>소스 파일\judge</Filter>
+    </ClCompile>
+    <ClCompile Include="judge\judge_file_writer.cpp">
+      <Filter>소스 파일\judge</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="gui.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\main_window.hpp">
+      <Filter>헤더 파일\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\i18n_helper.hpp">
+      <Filter>헤더 파일\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\about_window.hpp">
+      <Filter>헤더 파일\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\scroll_panel.hpp">
+      <Filter>헤더 파일\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\about_window\license_box.hpp">
+      <Filter>헤더 파일\gui\about_window</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\wrapper_panel.hpp">
+      <Filter>헤더 파일\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\judge_page.hpp">
+      <Filter>헤더 파일\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\judge_page\test_case_box.hpp">
+      <Filter>헤더 파일\gui\judge_page</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\code_textbox.hpp">
+      <Filter>헤더 파일\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\test_window.hpp">
+      <Filter>헤더 파일\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\detail\hack_textbox.hpp">
+      <Filter>헤더 파일\gui\widgets\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\judge_page\test_stream_box.hpp">
+      <Filter>헤더 파일\gui\judge_page</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\page_base.hpp">
+      <Filter>헤더 파일\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="judge\judge_stream_info.hpp">
+      <Filter>헤더 파일\judge</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\make_array.hpp">
+      <Filter>헤더 파일\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\singleton.hpp">
+      <Filter>헤더 파일\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="judge\judge_process.hpp">
+      <Filter>헤더 파일\judge</Filter>
+    </ClInclude>
+    <ClInclude Include="judge\judge_file_writer.hpp">
+      <Filter>헤더 파일\judge</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
