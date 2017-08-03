@@ -98,16 +98,16 @@ namespace dscv
 				plc_.collocate();
 			}
 
-			void TestCaseBox::add_text_stream_in_file(std::size_t pos, const char* filename)
-			{
-				_add_text_stream_file(in_file_boxes_, pos,
-					std::make_unique<TestInStreamBox>(*this, filename, pos + 1));
-			}
-
 			void TestCaseBox::add_text_stream_inout_file(std::size_t pos, const char* filename)
 			{
 				_add_text_stream_file(inout_file_boxes_, pos,
 					std::make_unique<TestInOutStreamBox>(*this, filename, pos + 1));
+			}
+
+			void TestCaseBox::add_text_stream_in_file(std::size_t pos, const char* filename)
+			{
+				_add_text_stream_file(in_file_boxes_, pos,
+					std::make_unique<TestInStreamBox>(*this, filename, pos + 1));
 			}
 
 			void TestCaseBox::add_text_stream_out_file(std::size_t pos, const char* filename)
@@ -208,12 +208,16 @@ namespace dscv
 
 			std::string TestCaseBox::text_stream_stdin() const noexcept
 			{
-				return std::string();
+				if (stdin_box_)
+					return stdin_box_->text_case();
+				return "";
 			}
 
 			std::string TestCaseBox::text_stream_stdout_case() const noexcept
 			{
-				return std::string();
+				if (stdout_box_)
+					return stdout_box_->text_case();
+				return "";
 			}
 
 			void TestCaseBox::text_stream_stdout_result_append(const std::string& str)

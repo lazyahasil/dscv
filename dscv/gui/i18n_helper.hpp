@@ -24,7 +24,7 @@ namespace dscv
 			}
 
 			//! Removes i18n data sourced from the I18nData container.
-			//! Since Nana doesn't provides i18n removal feature, it simply overwrites msgstr with msgid,
+			//! Since Nana doesn't provide i18n removal feature, it simply overwrites msgstr with msgid,
 			//! and loads the English data.
 			template <typename I18nDataContainer>
 			void remove_data_sourced(const I18nDataContainer& arr)

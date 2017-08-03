@@ -241,7 +241,7 @@ namespace dscv
 		{
 			internationalization i18n;
 			msgbox mb{ i18n("Judging Process Error") };
-			mb.icon(msgbox::icon_error)	<< i18n("_msg_process_error_2_args",
+			mb.icon(msgbox::icon_error) << i18n("_msg_process_error_2_args",
 				std::to_string(process_num), charset(ec.message()).to_bytes(unicode::utf8));
 			if (!extra.empty())
 				mb << " (" << extra << ")";

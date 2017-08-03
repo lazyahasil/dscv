@@ -38,8 +38,8 @@ namespace dscv
 				TestCaseBox() = delete;
 				TestCaseBox(nana::window wd, JudgePage& page, std::size_t num);
 
-				void add_text_stream_in_file(std::size_t pos, const char* filename);
 				void add_text_stream_inout_file(std::size_t pos, const char* filename);
+				void add_text_stream_in_file(std::size_t pos, const char* filename);
 				void add_text_stream_out_file(std::size_t pos, const char* filename);
 				bool add_text_stream_stdin();
 				bool add_text_stream_stdout();
@@ -65,11 +65,6 @@ namespace dscv
 
 				std::size_t proper_height() const override;
 
-				std::string text_stream_in_file_case(std::size_t pos) const
-				{
-					return dynamic_cast<TestInStreamBox&>(*in_file_boxes_.boxes[pos]).text_case();
-				}
-
 				std::string text_stream_inout_file_case_in(std::size_t pos) const
 				{
 					return dynamic_cast<TestInOutStreamBox&>(*inout_file_boxes_.boxes[pos]).text_case();
@@ -83,6 +78,11 @@ namespace dscv
 				void text_stream_inout_file_result_append(std::size_t pos, const std::string& str)
 				{
 					dynamic_cast<TestInOutStreamBox&>(*inout_file_boxes_.boxes[pos]).text_result_append(str);
+				}
+
+				std::string text_stream_in_file_case(std::size_t pos) const
+				{
+					return dynamic_cast<TestInStreamBox&>(*in_file_boxes_.boxes[pos]).text_case();
 				}
 
 				std::string text_stream_out_file_case(std::size_t pos) const
