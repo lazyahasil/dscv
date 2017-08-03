@@ -8,7 +8,7 @@ namespace dscv
 {
 	namespace judge
 	{
-		using LogHandler = void(std::size_t, const boost::system::error_code&, const std::string&);
+		using ErrorHandler = void(std::size_t, const boost::system::error_code&);
 		using StdoutHandler = void(const char*, std::size_t);
 
 		class JudgeProcess;
@@ -54,13 +54,18 @@ namespace dscv
 					boost::asio::io_service& io_service
 				);
 
-				void post_receive();
+				void prepare_async()
+				{
+					_post_receive();
+				}
 
 			private:
-				void _handle_exit(int exit, const std::error_code& ec_in);
 				void _handle_receive(const boost::system::error_code& ec, size_t bytes_transferred);
+				void _post_receive();
 
 			public:
+				//! The base class of JudgeProcessUnit::ChildItem
+				//! This class is intended to initialize pipes first.
 				struct ChildItemBase
 				{
 					ChildItemBase() = delete;
@@ -69,18 +74,33 @@ namespace dscv
 						: stdout_pipe(io_service)
 					{ }
 
+					boost::process::opstream stdin_ops;
 					boost::process::async_pipe stdout_pipe;
 				};
 
+				//! It contains destructable I/O items.
+				//! There are a process handle, a input buffer for stdout and I/O pipes.
 				struct ChildItem : public ChildItemBase
 				{
 					ChildItem() = delete;
 
+					//! The constructor.
+					//! Be aware that it automatically sets boost::process::child constructor's
+					//! boost::process::std_in and boost::process::std_out parameters.
 					template <typename ...Args>
-					ChildItem(boost::asio::io_service& io_service, Args&&... args)
+					ChildItem(
+						const JudgeProcessData& process_data, boost::asio::io_service& io_service, Args&&... args
+					)
 						: ChildItemBase(io_service),
-						  child(std::forward<Args>(args)..., boost::process::std_out > stdout_pipe)
-					{ }
+						  child(
+							  std::forward<Args>(args)...,
+							  boost::process::std_in < stdin_ops,
+							  boost::process::std_out > stdout_pipe
+						  )
+					{
+						// std::endl is necessary to send output pipe stream, not a null terminater
+						stdin_ops << process_data.stdin_str << std::endl;
+					}
 
 					boost::process::child child;
 					boost::asio::streambuf stdout_buf;
@@ -100,17 +120,17 @@ namespace dscv
 		public:
 			JudgeProcess() = delete;
 
-			explicit JudgeProcess(std::function<LogHandler>&& log_handler)
+			explicit JudgeProcess(std::function<ErrorHandler>&& log_handler)
 				: log_handler_(std::move(log_handler))
 			{ }
 
 			JudgeProcess(
 				std::initializer_list<JudgeProcessData> processes_data,
-				std::function<LogHandler>&& log_handler
+				std::function<ErrorHandler>&& log_handler
 			);
 
 			template<typename IterT>
-			JudgeProcess(IterT begin, IterT end, std::function<LogHandler>&& log_handler)
+			JudgeProcess(IterT begin, IterT end, std::function<ErrorHandler>&& log_handler)
 				: log_handler_(std::move(log_handler))
 			{
 				// For std::move_iterator, don't add const and pass it through std::move()
@@ -131,11 +151,9 @@ namespace dscv
 				);
 			}
 
-			void handle_error(
-				std::size_t process_num, const boost::system::error_code& ec, const std::string& extra
-			) const
+			void handle_error(std::size_t process_num, const boost::system::error_code& ec) const
 			{
-				log_handler_(process_num, ec, extra);
+				log_handler_(process_num, ec);
 			}
 			
 			bool is_done() const noexcept
@@ -166,7 +184,7 @@ namespace dscv
 
 		private:
 			std::vector<std::unique_ptr<detail::JudgeProcessUnit>> processes_;
-			std::function<LogHandler> log_handler_;
+			std::function<ErrorHandler> log_handler_;
 
 			std::weak_ptr<boost::process::group> group_wptr_;
 		};

@@ -4,6 +4,8 @@
 
 #include <nana/gui/filebox.hpp>
 
+#include <boost/algorithm/string.hpp>
+
 using namespace nana;
 
 namespace dscv
@@ -65,6 +67,11 @@ namespace dscv
 			label_exe_path_.transparent(true);
 			tb_exe_path_.multi_lines(false);
 			btn_judge_terminate_.bgcolor(colors::orange);
+
+			events().destroy([this] {
+				if (auto ptr = process_wptr_.lock())
+					ptr->terminate();
+			});
 
 			btn_exe_path_.events().click([this] {
 				internationalization i18n;
@@ -163,14 +170,19 @@ namespace dscv
 		{
 			namespace fs = boost::filesystem;
 
+			// Clear results and initiate the time point
+			_clear_test_case_results();
+			judge_started_time_ = std::chrono::system_clock::now();
+
+			internationalization i18n;
+			_propagate_judging_error(i18n("_msg_judge_start"));
+
 			plc_.field_display("btn_judge_start", false);
 			plc_.field_display("btn_judge_terminate", true);
 			plc_.collocate();
 
 			if (btn_judge_start_.focused())
 				btn_judge_terminate_.focus();
-
-			_clear_test_case_results();
 
 			try
 			{
@@ -183,8 +195,8 @@ namespace dscv
 					throw std::runtime_error{ std::string{ "Cannot create a directory: " } + work_path.string() };
 				
 				auto process = std::make_shared<judge::JudgeProcess>(
-					[this](std::size_t process_num,	const boost::system::error_code& ec, const std::string& extra) {
-					_handle_judging_error(process_num, ec, extra);
+					[this](std::size_t process_num,	const boost::system::error_code& ec) {
+					_handle_judging_error(process_num, ec);
 				});
 				process_wptr_ = process;
 
@@ -200,7 +212,12 @@ namespace dscv
 						tc.text_stream_stdout_result_append(std::string{ str, bytes });
 					};
 
-					process->emplace_back(dir.wstring(), tc.text_stream_stdin(), stdout_handler);
+					// Get the stdin case text
+					auto stdin_str = tc.text_stream_stdin();
+					//if (!boost::ends_with(stdin_str, "\n")) // If it doesn't end with endl, push one back
+					//	stdin_str.push_back('\n');
+
+					process->emplace_back(dir.wstring(), stdin_str, stdout_handler);
 
 					for (std::size_t i = 0; i < stream_info_.in_files.size(); i++)
 						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_in_file_case(i));
@@ -208,6 +225,8 @@ namespace dscv
 					for (std::size_t i = 0; i < stream_info_.inout_files.size(); i++)
 						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_inout_file_case_in(i));
 				}
+
+				_propagate_judging_error(i18n("_msg_judge_launching_processes"));
 
 				std::thread{ [this, process, program_path] {
 					process->launch(program_path);
@@ -218,8 +237,8 @@ namespace dscv
 			{
 				_show_btn_judge_start();
 				internationalization i18n;
-				msgbox mb{ i18n("Starting Judging Failed") };
-				mb.icon(msgbox::icon_error) << i18n("_msg_error_1_arg", charset(e.what()).to_bytes(unicode::utf8));
+				msgbox mb{ i18n("Starting Judgment Failed") };
+				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_1_arg", charset(e.what()).to_bytes(unicode::utf8));
 				mb.show();
 			}
 		}
@@ -229,23 +248,67 @@ namespace dscv
 			for (const auto& wrapper : test_cases_)
 			{
 				auto& tc = wrapper->content();
-				tc.clear_results();
+				tc.clear_results_and_log();
 			}
 		}
 
 		void JudgePage::_handle_judging_error(
-			std::size_t process_num,
-			const boost::system::error_code& ec,
-			const std::string& extra
+			std::size_t case_num,
+			const boost::system::error_code& ec
 		)
 		{
 			internationalization i18n;
-			msgbox mb{ i18n("Judging Process Error") };
-			mb.icon(msgbox::icon_error) << i18n("_msg_process_error_2_args",
-				std::to_string(process_num), charset(ec.message()).to_bytes(unicode::utf8));
-			if (!extra.empty())
-				mb << " (" << extra << ")";
-			mb.show();
+			std::ostringstream oss;
+			
+			oss << i18n("Error") << ": ";
+
+			if (case_num != 0) // Test case error
+			{
+				// Interpret error_code
+				if (ec == boost::asio::error::broken_pipe)
+					oss << i18n("_msg_error_asio_broken_pipe");
+				else
+					oss << charset{ ec.message() }.to_bytes(unicode::utf8);
+
+				// Write a log to the corresponding test case
+				_propagate_judging_error(case_num, oss.str());
+			}
+			else // Termination signals
+			{
+				if (ec == boost::asio::error::timed_out)
+					oss << i18n("_msg_error_process_termination_timed_out");
+				else if (case_num == 0 && ec == boost::system::errc::operation_canceled)
+					oss << i18n("_msg_error_process_termination_ordered");
+				else
+					oss << charset{ ec.message() }.to_bytes(unicode::utf8);
+
+				auto str = oss.str();
+
+				// Write a log to all the test cases
+				_propagate_judging_error(str);
+
+				// Launch a msgbox
+				//msgbox mb{ i18n("Judged Process Error") };
+				//mb.icon(msgbox::icon_error) << i18n("_msgbox_error_1_arg", str);
+				//mb.show();
+			}
+		}
+
+		void JudgePage::_propagate_judging_error(const std::string& err_msg)
+		{
+			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now() - judge_started_time_);
+
+			for (auto& wrapper : test_cases_)
+				wrapper->content().handle_judging_error(elapsed_time, err_msg);
+		}
+
+		void JudgePage::_propagate_judging_error(std::size_t case_num, const std::string& err_msg)
+		{
+			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::now() - judge_started_time_);
+
+			test_cases_[case_num - 1]->content().handle_judging_error(elapsed_time, err_msg);
 		}
 
 		void JudgePage::_show_btn_judge_start()

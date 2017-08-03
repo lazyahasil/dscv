@@ -4,6 +4,8 @@
 
 #include <nana/gui/msgbox.hpp>
 
+#include <iomanip>
+
 using namespace nana;
 
 namespace dscv
@@ -158,8 +160,10 @@ namespace dscv
 				label_test_case_.i18n(i18n_eval{ "Test Case %arg0", std::to_string(num) });
 			}
 
-			void TestCaseBox::clear_results()
+			void TestCaseBox::clear_results_and_log()
 			{
+				ctb_test_log_.tb().caption("");
+
 				if (stdout_box_)
 					stdout_box_->clear_result();
 
@@ -168,6 +172,22 @@ namespace dscv
 
 				for (auto& inout_box : inout_file_boxes_.boxes)
 					dynamic_cast<TestInOutStreamBox&>(*inout_box).clear_result();
+			}
+
+			void TestCaseBox::handle_judging_error(
+				const std::chrono::milliseconds& elapsed_time,
+				const std::string& err_msg
+			)
+			{
+				std::ostringstream oss;
+				auto sec = std::chrono::duration_cast<std::chrono::seconds>(elapsed_time).count();
+				auto msec = elapsed_time.count() - sec * 1000;
+
+				oss.fill('0');
+				oss << "[" << std::setw(2) << sec << "." << std::setw(3) << msec << "] ";
+				oss << err_msg << std::endl;
+
+				ctb_test_log_.tb().append(oss.str(), false);
 			}
 
 			bool TestCaseBox::stream_boxes_empty()

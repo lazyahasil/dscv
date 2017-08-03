@@ -4,6 +4,8 @@
 #include "../page_base.hpp"
 #include "test_stream_box.hpp"
 
+#include <boost/system/error_code.hpp>
+
 namespace dscv
 {
 	namespace gui
@@ -51,7 +53,7 @@ namespace dscv
 				}
 
 				void case_num(std::size_t num);
-				void clear_results();
+				void clear_results_and_log();
 
 				void collocate()
 				{
@@ -62,6 +64,8 @@ namespace dscv
 				{
 					btn_remove_case_.enabled(!is_disabled);
 				}
+
+				void handle_judging_error(const std::chrono::milliseconds& elapsed_time, const std::string& err_msg);
 
 				std::size_t proper_height() const override;
 

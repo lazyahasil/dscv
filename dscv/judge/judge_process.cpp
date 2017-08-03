@@ -19,13 +19,12 @@ namespace dscv
 			)
 			{
 				auto item = std::make_shared<ChildItem>(
+					data_,
 					io_service,
 					group,
 					program_path,
-					bp::std_in < data_.stdin_str,
-					bp::start_dir = data_.dir_overload,
 					env,
-					bp::on_exit = [this](int exit, const std::error_code& ec_in) { _handle_exit(exit, ec_in); }
+					bp::start_dir = data_.dir_overload
 				);
 
 				item_wptr_ = item;
@@ -33,31 +32,11 @@ namespace dscv
 				return item;
 			}
 
-			void JudgeProcessUnit::post_receive()
-			{
-				if (auto item = item_wptr_.lock())
-				{
-					boost::asio::async_read(item->stdout_pipe, item->stdout_buf, boost::asio::transfer_at_least(1),
-						[this](const boost::system::error_code& ec, std::size_t bytes_transferred) {
-						_handle_receive(ec, bytes_transferred);
-					});
-				}
-			}
-
-			void JudgeProcessUnit::_handle_exit(int exit, const std::error_code& ec_in)
-			{
-				group_ref_.handle_error(
-					process_num_,
-					boost::system::error_code{ ec_in.value(), (boost::system::error_category&)(ec_in.category()) },
-					std::string{ "exit code: " } + std::to_string(exit)
-				);
-			}
-
 			void JudgeProcessUnit::_handle_receive(const boost::system::error_code& ec, size_t bytes_transferred)
 			{
 				if (ec)
 				{
-					group_ref_.handle_error(process_num_, ec, "");
+					group_ref_.handle_error(process_num_, ec);
 					if (auto item = item_wptr_.lock())
 						item->child.terminate();
 					return;
@@ -69,14 +48,25 @@ namespace dscv
 						boost::asio::buffer_cast<const char*>(item->stdout_buf.data()), bytes_transferred
 					);
 					item->stdout_buf.consume(bytes_transferred);
-					post_receive();
+					_post_receive();
+				}
+			}
+
+			void JudgeProcessUnit::_post_receive()
+			{
+				if (auto item = item_wptr_.lock())
+				{
+					boost::asio::async_read(item->stdout_pipe, item->stdout_buf, boost::asio::transfer_at_least(1),
+						[this](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+						_handle_receive(ec, bytes_transferred);
+					});
 				}
 			}
 		}
 
 		JudgeProcess::JudgeProcess(
 			std::initializer_list<JudgeProcessData> processes_data,
-			std::function<LogHandler>&& log_handler
+			std::function<ErrorHandler>&& log_handler
 		) : log_handler_(std::move(log_handler))
 		{
 			processes_.reserve(processes_data.size());
@@ -101,13 +91,16 @@ namespace dscv
 			for (auto& p : processes_)
 			{
 				children.emplace_back(p->make_child(program_path, *group, env, io_service));
-				p->post_receive();
+				p->prepare_async();
 			}
 
 			io_service.run();
 
-			if (!group->wait_for(std::chrono::milliseconds(1500)) && group->valid())
+			if (!group->wait_for(std::chrono::milliseconds(1500)))
+			{
+				log_handler_(0, boost::asio::error::make_error_code(boost::asio::error::timed_out));
 				group->terminate();
+			}
 
 			for (auto& c : children)
 				c->stdout_pipe.close();
@@ -125,7 +118,10 @@ namespace dscv
 		{
 			// To prevent a null pointer exception
 			if (auto group = group_wptr_.lock())
+			{
+				log_handler_(0, boost::system::errc::make_error_code(boost::system::errc::operation_canceled));
 				group->terminate();
+			}
 		}
 	}
 }

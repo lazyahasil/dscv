@@ -4,11 +4,7 @@
 #include "page_base.hpp"
 #include "../judge/judge_process.hpp"
 
-#include <nana/gui.hpp>
-#include <nana/gui/widgets/button.hpp>
-#include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/progress.hpp>
-#include <nana/gui/widgets/textbox.hpp>
 
 #include <mutex>
 
@@ -64,13 +60,9 @@ namespace dscv
 		private:
 			void _start_judging();
 			void _clear_test_case_results();
-
-			void _handle_judging_error(
-				std::size_t process_num,
-				const boost::system::error_code& ec,
-				const std::string& extra
-			);
-
+			void _handle_judging_error(std::size_t case_num, const boost::system::error_code& ec);
+			void _propagate_judging_error(const std::string& err_msg);
+			void _propagate_judging_error(std::size_t case_num, const std::string& err_msg);
 			void _show_btn_judge_start();
 
 			nana::place plc_{ *this };
@@ -93,7 +85,7 @@ namespace dscv
 
 			judge::JudgeStreamInfo stream_info_;
 			std::weak_ptr<judge::JudgeProcess> process_wptr_;
-			std::chrono::time_point<std::chrono::system_clock> judge_time_point_;
+			std::chrono::time_point<std::chrono::system_clock> judge_started_time_;
 		};
 	}
 }

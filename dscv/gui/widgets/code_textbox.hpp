@@ -54,25 +54,8 @@ namespace dscv
 
 			void editable(bool is_editable);
 
-			decltype(auto) min_or_max_vert_scrolled_func() const noexcept
-			{
-				return min_or_max_vert_scrolled_func_.target<void(*)(bool)>();
-			}
-
 			void min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept;
-
-			decltype(auto) line_num_bgcolor_func() const noexcept
-			{
-				return line_num_bgcolor_func_.target<nana::color(*)(std::size_t)>();
-			}
-
 			void line_num_bgcolor_func(std::function<nana::color(std::size_t)> functor) noexcept;
-
-			decltype(auto) line_num_fgcolor_func() const noexcept
-			{
-				return line_num_bgcolor_func_.target<nana::color(*)(std::size_t)>();
-			}
-
 			void line_num_fgcolor_func(std::function<nana::color(std::size_t)> functor) noexcept;
 
 			nana::textbox& tb() noexcept
