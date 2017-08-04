@@ -8,7 +8,7 @@ namespace dscv
 	{
 		//! The Base class of page panels into ScrollPanel.
 		class PageBase
-			: public nana::panel<false>, public detail::ScrollPanelBase::SideAdaptable<true>
+			: public nana::panel<false>, public SideAdaptable<true>
 		{
 		public:
 			explicit PageBase(nana::window wd) : nana::panel<false>(wd) { }

@@ -10,6 +10,7 @@ namespace dscv
 		namespace detail
 		{
 			//! The base class of WrapperPanel.
+			//!
 			//! This class was intended to make a pointer to WrapperPanel.
 			template <bool HasBackground>
 			class WrapperPanelBase : public nana::panel<HasBackground>
@@ -50,6 +51,7 @@ namespace dscv
 				}
 
 				//! Puts its content to nana::place.
+				//!
 				//! This is done by calling nana::place::field_interface::operator<<().
 				//! @sa umake_content_div()
 				void make_content_div()
@@ -62,6 +64,7 @@ namespace dscv
 				}
 
 				//! Erases its content from nana::place.
+				//!
 				//! This is done by calling nana::place::erase().
 				//! @sa make_content_div()
 				void umake_content_div()
@@ -81,6 +84,7 @@ namespace dscv
 		}
 
 		//! A wrapping panel for any widgets.
+		//!
 		//! This class prevents its content widget to get out of desired area.
 		//! The content type must be taken as nana::widget or derived class of that.
 		template <bool HasBackground, typename ContentT>
@@ -91,6 +95,7 @@ namespace dscv
 
 		public:
 			//! The constructor.
+			//!
 			//! Basically, make_content_div() is called.
 			//! @param wd the parent's handle
 			//! @param args the arguments forwarded to the content's constructor without the parent's handle

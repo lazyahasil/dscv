@@ -31,7 +31,7 @@ namespace dscv
 			}
 
 			// Note: add_text_stream_...() methods doesn't call nana::place::collocate().
-			class TestCaseBox : public nana::panel<false>, detail::ScrollPanelBase::SideAdaptable<true>
+			class TestCaseBox : public nana::panel<false>, SideAdaptable<true>
 			{
 			private:
 				struct FileBoxes;
