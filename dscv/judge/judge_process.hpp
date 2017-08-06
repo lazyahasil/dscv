@@ -17,11 +17,15 @@ namespace dscv
 		{
 			JudgeProcessData() = delete;
 
+			template <typename WStringT, typename StringT>
 			JudgeProcessData(
-				const std::wstring& _dir_overload,
-				const std::string& _stdin_str,
+				WStringT&& _dir_overload,
+				StringT&& _stdin_str,
 				std::function<StdoutHandler>&& _stdout_handler
-			) : dir_overload(_dir_overload), stdin_str(_stdin_str), stdout_handler(_stdout_handler)
+			)
+				: dir_overload(std::forward<WStringT>(_dir_overload)),
+				  stdin_str(std::forward<StringT>(_stdin_str)),
+				  stdout_handler(_stdout_handler)
 			{ }
 
 			std::wstring dir_overload;
@@ -31,6 +35,9 @@ namespace dscv
 
 		namespace detail
 		{
+			//! A single process unit for JudgeProcess
+			//!
+			//! It provides asynchronous I/O methods
 			class JudgeProcessUnit
 			{
 			public:
@@ -54,57 +61,31 @@ namespace dscv
 					boost::asio::io_service& io_service
 				);
 
+				//! Start async post methods
 				void prepare_async()
 				{
+					_post_send();
 					_post_receive();
 				}
 
 			private:
 				void _handle_receive(const boost::system::error_code& ec, size_t bytes_transferred);
+				void _handle_send(const boost::system::error_code& ec, size_t bytes_transferred);
 				void _post_receive();
+				void _post_send();
 
 			public:
 				//! The base class of JudgeProcessUnit::ChildItem
+				//!
 				//! This class is intended to initialize pipes first.
-				struct ChildItemBase
-				{
-					ChildItemBase() = delete;
-
-					explicit ChildItemBase(boost::asio::io_service& io_service)
-						: stdout_pipe(io_service)
-					{ }
-
-					boost::process::opstream stdin_ops;
-					boost::process::async_pipe stdout_pipe;
-				};
+				struct ChildItemBase;
 
 				//! It contains destructable I/O items.
-				//! There are a process handle, a input buffer for stdout and I/O pipes.
-				struct ChildItem : public ChildItemBase
-				{
-					ChildItem() = delete;
-
-					//! The constructor.
-					//! Be aware that it automatically sets boost::process::child constructor's
-					//! boost::process::std_in and boost::process::std_out parameters.
-					template <typename ...Args>
-					ChildItem(
-						const JudgeProcessData& process_data, boost::asio::io_service& io_service, Args&&... args
-					)
-						: ChildItemBase(io_service),
-						  child(
-							  std::forward<Args>(args)...,
-							  boost::process::std_in < stdin_ops,
-							  boost::process::std_out > stdout_pipe
-						  )
-					{
-						// std::endl is necessary to send output pipe stream, not a null terminater
-						stdin_ops << process_data.stdin_str << std::endl;
-					}
-
-					boost::process::child child;
-					boost::asio::streambuf stdout_buf;
-				};
+				//!
+				//! There are a process handle, a input buffer for stdout and I/O pipes.\n
+				//! The function, which manages process routine, owns and destructs std::shared_ptr of it.
+				//! So JudgeProcessUnit has std::weak_ptr and is able to use it safely whether the process is running.
+				struct ChildItem;
 
 			private:
 				const JudgeProcess& group_ref_;
@@ -113,8 +94,49 @@ namespace dscv
 
 				std::weak_ptr<ChildItem> item_wptr_;
 			};
+
+			struct JudgeProcessUnit::ChildItemBase
+			{
+				ChildItemBase() = delete;
+
+				explicit ChildItemBase(boost::asio::io_service& io_service)
+					: stdin_pipe(io_service), stdout_pipe(io_service)
+				{ }
+
+				boost::process::async_pipe stdin_pipe;
+				boost::process::async_pipe stdout_pipe;
+			};
+
+			struct JudgeProcessUnit::ChildItem : public JudgeProcessUnit::ChildItemBase
+			{
+				ChildItem() = delete;
+
+				//! The constructor.
+				//!
+				//! Be aware that it automatically sets boost::process::child constructor's
+				//! boost::process::std_in and boost::process::std_out parameters.
+				template <typename ...Args>
+				ChildItem(
+					const JudgeProcessData& process_data,
+					boost::asio::io_service& io_service,
+					Args&&... args
+				)
+					: ChildItemBase(io_service),
+					  child(
+						  std::forward<Args>(args)...,
+						  boost::process::std_in < stdin_pipe,
+						  boost::process::std_out > stdout_pipe
+					  )
+				{ }
+
+				boost::process::child child;
+				boost::asio::streambuf stdout_buf;
+			};
 		}
 
+		//! Judged process pack
+		//!
+		//! @sa detail::ChildItem
 		class JudgeProcess
 		{
 		public:

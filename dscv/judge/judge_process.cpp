@@ -52,6 +52,23 @@ namespace dscv
 				}
 			}
 
+			void JudgeProcessUnit::_handle_send(const boost::system::error_code& ec, size_t bytes_transferred)
+			{
+				if (ec)
+				{
+					group_ref_.handle_error(process_num_, ec);
+					if (auto item = item_wptr_.lock())
+						item->child.terminate();
+					return;
+				}
+
+				if (auto item = item_wptr_.lock())
+				{
+					// Close the pipe to make the stdin EOF
+					item->stdin_pipe.async_close();
+				}
+			}
+
 			void JudgeProcessUnit::_post_receive()
 			{
 				if (auto item = item_wptr_.lock())
@@ -59,6 +76,17 @@ namespace dscv
 					boost::asio::async_read(item->stdout_pipe, item->stdout_buf, boost::asio::transfer_at_least(1),
 						[this](const boost::system::error_code& ec, std::size_t bytes_transferred) {
 						_handle_receive(ec, bytes_transferred);
+					});
+				}
+			}
+
+			void JudgeProcessUnit::_post_send()
+			{
+				if (auto item = item_wptr_.lock())
+				{
+					boost::asio::async_write(item->stdin_pipe, boost::asio::buffer(data_.stdin_str),
+						[this](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+						_handle_send(ec, bytes_transferred);
 					});
 				}
 			}

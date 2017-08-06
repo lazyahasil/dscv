@@ -217,7 +217,7 @@ namespace dscv
 					//if (!boost::ends_with(stdin_str, "\n")) // If it doesn't end with endl, push one back
 					//	stdin_str.push_back('\n');
 
-					process->emplace_back(dir.wstring(), stdin_str, stdout_handler);
+					process->emplace_back(dir.wstring(), std::move(stdin_str), stdout_handler);
 
 					for (std::size_t i = 0; i < stream_info_.in_files.size(); i++)
 						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_in_file_case(i));
