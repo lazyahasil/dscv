@@ -4,10 +4,12 @@
 
 *Warning: it's work in progress*
 
-It launches a executable as processes connecting text streams.
+This is a GUI program using Nana library. It launches an executable file to multiple processes connecting their text streams, using Boost.Process.
 This project aims to avoid repetitive copy, paste & re-opening when making a code for online judge.
 
-Written in C++14 with MSVC 2015 Update 3 Community.
+I'm sorry that it's WIP. Soon there will be added licenses from libraries.
+
+Written in C++14 with MSVC 2015 Community Update 3.
 
 * [Nana C++ Library](http://nanapro.org/en-us/) 1.5.4
 * [Boost C++ Libraries](http://www.boost.org/) 1.64.0
