@@ -19,7 +19,6 @@ namespace dscv
 			)
 			{
 				auto item = std::make_shared<ChildItem>(
-					data_,
 					io_service,
 					group,
 					program_path,

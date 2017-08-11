@@ -12,7 +12,7 @@ namespace dscv
 		//!
 		//! ScrollPanel can make use of the SideAdapatable content.\n
 		//! If IsWidthAdaptable is false, virtual SideAdaptable<false>::proper_width() is provided,
-		//! and if IsWidthAdaptable is true, virtual SideAdaptable<true>::proper_height() is provided.
+		//! and if IsWidthAdaptable is true, virtual SideAdaptable<true>::proper_height() is provided.\n
 		//! In short, you need to set size of the inadapatable side.
 		//! @sa SideAdaptable<false>
 		//! @sa SideAdaptable<true>

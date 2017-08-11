@@ -13,6 +13,7 @@ namespace dscv
 
 		class JudgeProcess;
 
+		//! A struct of process' data.
 		struct JudgeProcessData
 		{
 			JudgeProcessData() = delete;
@@ -25,27 +26,32 @@ namespace dscv
 			)
 				: dir_overload(std::forward<WStringT>(_dir_overload)),
 				  stdin_str(std::forward<StringT>(_stdin_str)),
-				  stdout_handler(_stdout_handler)
+				  stdout_handler(std::move(_stdout_handler))
 			{ }
 
-			std::wstring dir_overload;
-			std::string stdin_str;
-			std::function<StdoutHandler> stdout_handler;
+			std::wstring dir_overload; //!< Working directory for the process
+			std::string stdin_str; //!< String for stdin output
+			std::function<StdoutHandler> stdout_handler; //!< Handler function object for stdout input
 		};
 
 		namespace detail
 		{
-			//! A single process unit for JudgeProcess
+			//! A single process unit for JudgeProcess.
 			//!
-			//! It provides asynchronous I/O methods
+			//! It provides asynchronous I/O methods using Boost.ASIO and Boost.Process.
 			class JudgeProcessUnit
 			{
 			public:
-				struct ChildItem;
+				struct ChildItem; // Forward declaration
 
 			public:
 				JudgeProcessUnit() = delete;
 
+				//! The constructor.
+				//!
+				//! @param group_ref const reference to the JudgeProcess
+				//! @param process_num number of this process; must start from 1
+				//! @param args arguments for JudgeProcessData's constructor
 				template <typename ...Args>
 				JudgeProcessUnit(const JudgeProcess& group_ref, std::size_t process_num, Args&&... args)
 					: group_ref_(group_ref), process_num_(process_num), data_(std::forward<Args>(args)...)
@@ -54,6 +60,15 @@ namespace dscv
 				JudgeProcessUnit(const JudgeProcessUnit& src) = delete;
 				JudgeProcessUnit& operator=(const JudgeProcessUnit& src) = delete;
 
+				//! Returns a new std::shared_ptr<ChildItem> object.
+				//!
+				//! JudgeProcessUnit keeps std::weak_ptr of the returned object.\n
+				//! You have to call prepare_async() after calling it.
+				//! @param program_path path of the executable program
+				//! @param group boost::process:group object
+				//! @param env process environment in std::wstring
+				//! @param io_service reference to the boost::asio::io_service object
+				//! @sa ChildItem
 				std::shared_ptr<ChildItem> make_child(
 					const boost::filesystem::path& program_path,
 					boost::process::group& group,
@@ -61,7 +76,7 @@ namespace dscv
 					boost::asio::io_service& io_service
 				);
 
-				//! Start async post methods
+				//! Start asynchronous post methods.
 				void prepare_async()
 				{
 					_post_send();
@@ -75,7 +90,7 @@ namespace dscv
 				void _post_send();
 
 			public:
-				//! The base class of JudgeProcessUnit::ChildItem
+				//! The base class of JudgeProcessUnit::ChildItem.
 				//!
 				//! This class is intended to initialize pipes first.
 				struct ChildItemBase;
@@ -88,11 +103,11 @@ namespace dscv
 				struct ChildItem;
 
 			private:
-				const JudgeProcess& group_ref_;
-				std::size_t process_num_;
-				JudgeProcessData data_;
+				const JudgeProcess& group_ref_; //!< Const reference to the JudgeProcess
+				std::size_t process_num_; //!< Number of this process
+				JudgeProcessData data_; //!< Data of this process
 
-				std::weak_ptr<ChildItem> item_wptr_;
+				std::weak_ptr<ChildItem> item_wptr_; //!< std::weak_ptr to the ChildItem
 			};
 
 			struct JudgeProcessUnit::ChildItemBase
@@ -103,8 +118,8 @@ namespace dscv
 					: stdin_pipe(io_service), stdout_pipe(io_service)
 				{ }
 
-				boost::process::async_pipe stdin_pipe;
-				boost::process::async_pipe stdout_pipe;
+				boost::process::async_pipe stdin_pipe; //!< Pipe for stdin output.
+				boost::process::async_pipe stdout_pipe; //!< Pipe for stdout input.
 			};
 
 			struct JudgeProcessUnit::ChildItem : public JudgeProcessUnit::ChildItemBase
@@ -115,12 +130,10 @@ namespace dscv
 				//!
 				//! Be aware that it automatically sets boost::process::child constructor's
 				//! boost::process::std_in and boost::process::std_out parameters.
+				//! @param io_service reference to the boost::asio::io_service object
+				//! @param args additional arguments for boost::process::child's constructor
 				template <typename ...Args>
-				ChildItem(
-					const JudgeProcessData& process_data,
-					boost::asio::io_service& io_service,
-					Args&&... args
-				)
+				ChildItem(boost::asio::io_service& io_service, Args&&... args)
 					: ChildItemBase(io_service),
 					  child(
 						  std::forward<Args>(args)...,
@@ -129,28 +142,43 @@ namespace dscv
 					  )
 				{ }
 
-				boost::process::child child;
-				boost::asio::streambuf stdout_buf;
+				boost::process::child child; //!< boost::process::child object
+				boost::asio::streambuf stdout_buf; //!< stdout input buffer
 			};
 		}
 
-		//! Judged process pack
+		//! Judged process pack.
 		//!
+		//! It contains a list of detail::JudgeProcessUnit objects.
 		//! @sa detail::ChildItem
 		class JudgeProcess
 		{
 		public:
 			JudgeProcess() = delete;
 
+			//! The constructor.
+			//!
+			//! @param log_handler Log handler function object
 			explicit JudgeProcess(std::function<ErrorHandler>&& log_handler)
 				: log_handler_(std::move(log_handler))
 			{ }
 
+			//! The constructor.
+			//!
+			//! @param processes_data List of JudgeProcessData elements
+			//! @param log_handler Log handler function object
 			JudgeProcess(
 				std::initializer_list<JudgeProcessData> processes_data,
 				std::function<ErrorHandler>&& log_handler
 			);
 
+			//! The constructor.
+			//!
+			//! By default, it moves elements if range iterators are moveable.
+			//! Otherwise, it copies.
+			//! @param begin begin iterator to the range of JudgeProcessData elements
+			//! @param end end iterator to the range of JudgeProcessData elements
+			//! @param log_handler log handler function object
 			template<typename IterT>
 			JudgeProcess(IterT begin, IterT end, std::function<ErrorHandler>&& log_handler)
 				: log_handler_(std::move(log_handler))
@@ -164,6 +192,9 @@ namespace dscv
 				});
 			}
 
+			//! Emplaces back a JudgeProcessData.
+			//!
+			//! @param args arguments for JudgeProcessData's constructor
 			template <typename ...Args>
 			void emplace_back(Args&&... args)
 			{
@@ -173,21 +204,33 @@ namespace dscv
 				);
 			}
 
+			//! Invokes the log handler.
+			//!
+			//! It is usually called by detail::JudgeProcessUnit.
+			//! @sa detail::JudgeProcessUnit
 			void handle_error(std::size_t process_num, const boost::system::error_code& ec) const
 			{
 				log_handler_(process_num, ec);
 			}
 			
+			//! Checks if the boost::process::group object is destroyed.
+			//! @returns true if destroyed
 			bool is_done() const noexcept
 			{
 				return group_wptr_.expired();
 			}
 
+			//! Launches all the processes in group.
 			bool launch(
 				const boost::filesystem::path& program_path,
 				const boost::process::wenvironment& env = boost::this_process::wenvironment()
 			) noexcept;
 
+			//! Push back a JudgeProcessData.
+			//!
+			//! emplace_back() is more efficient in usual.
+			//! @param data a JudgeProcessData object
+			//! @sa emplace_back()
 			template <typename JudgeProcessDataT>
 			void push_back(JudgeProcessDataT&& data)
 			{
@@ -197,18 +240,20 @@ namespace dscv
 				);
 			}
 
+			//! Returns the number of processes it has.
 			std::size_t size() const noexcept
 			{
 				return processes_.size();
 			}
 
+			//! Terminate the process group running.
 			void terminate();
 
 		private:
-			std::vector<std::unique_ptr<detail::JudgeProcessUnit>> processes_;
-			std::function<ErrorHandler> log_handler_;
+			std::vector<std::unique_ptr<detail::JudgeProcessUnit>> processes_; //!< detail::JudgeProcessUnit list
+			std::function<ErrorHandler> log_handler_; //!< Handler function object for logging
 
-			std::weak_ptr<boost::process::group> group_wptr_;
+			std::weak_ptr<boost::process::group> group_wptr_; //!< std::weak_ptr to the boost::process::group
 		};
 	}
 }
