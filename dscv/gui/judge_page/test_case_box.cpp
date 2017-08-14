@@ -5,6 +5,7 @@
 #include <nana/gui/msgbox.hpp>
 
 #include <iomanip>
+#include <sstream>
 
 using namespace nana;
 
@@ -22,29 +23,30 @@ namespace dscv
 				{
 					using namespace test_case_box::default_v_weights;
 
-					plc_.div((
-						std::string{} + ""
-						"vert"
-						"<weight=" + std::to_string(k_title) + ""
-						"  <label_test_case>"
-						"  <weight=100 margin=[4,0,4,0] btn_remove_case>"
-						">"
-						"<"
-						"  <vert"
-						"    <weight=200 stdin_box>"
-						"    <weight=0 in_file_boxes>"
-						"  >"
-						"  <weight=10>"
-						"  <vert"
-						"    <weight=33 margin=[6,0,5,2] label_test_log>"
-						"    <ctb_test_log>"
-						"  >"
-						">"
-						"<weight=" + std::to_string(k_gap_between_in_and_out) + ">"
-						"<weight=200 stdout_box>"
-						"<weight=0 out_file_boxes>"
-						"<weight=0 inout_file_boxes>"
-						).c_str()
+					plc_.div(
+						dynamic_cast<std::ostringstream&>(
+							std::ostringstream{} << ""
+							"vert"
+							"<weight=" << k_title << ""
+							"  <label_test_case>"
+							"  <weight=100 margin=[4,0,4,0] btn_remove_case>"
+							">"
+							"<"
+							"  <vert"
+							"    <weight=200 stdin_box>"
+							"    <weight=0 in_file_boxes>"
+							"  >"
+							"  <weight=10>"
+							"  <vert"
+							"    <weight=33 margin=[6,0,5,2] label_test_log>"
+							"    <ctb_test_log>"
+							"  >"
+							">"
+							"<weight=" << k_gap_between_in_and_out << ">"
+							"<weight=200 stdout_box>"
+							"<weight=0 out_file_boxes>"
+							"<weight=0 inout_file_boxes>"
+							).str().c_str()
 					);
 				}
 

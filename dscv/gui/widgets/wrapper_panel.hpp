@@ -23,12 +23,13 @@ namespace dscv
 
 				WrapperPanelBase() : WrapperPanelBase(nullptr) { }
 
-				//! Returns its content as nana::widget type
+				//! Returns its content as nana::widget type.
 				nana::widget& content_widget() const noexcept
 				{
 					return *content_ptr_.get();
 				}
 
+				// Makes content's height fixed with nana::place.
 				void fix_content_height(std::size_t fixed_height)
 				{
 					plc_.div((
@@ -40,6 +41,7 @@ namespace dscv
 					make_content_div();
 				}
 
+				// Makes content's width fixed with nana::place.
 				void fix_content_width(std::size_t fixed_width)
 				{
 					plc_.div((

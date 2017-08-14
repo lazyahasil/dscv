@@ -6,6 +6,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <sstream>
+
 using namespace nana;
 
 namespace dscv
@@ -20,26 +22,27 @@ namespace dscv
 				using namespace default_v_weights;
 				using namespace dynamic_v_weights;
 
-				plc_.div((
-					std::string{} + ""
-					"vert margin=" + std::to_string(k_top_and_bottom) + ""
-					"<weight=" + std::to_string(k_exe_path_bar) + " margin=[0,0,18,0]"
-					"  <weight=90 label_exe_path>"
-					"  <margin=[0,4,0,0] tb_exe_path>"
-					"  <weight=60 btn_exe_path>"
-					">"
-					"<weight=" + std::to_string(k_judge_bar) + " margin=[0,0,6,0]"
-					"  <weight=80 btn_judge_settings>"
-					"  <weight=5%>"
-					"  <margin=[0,4,0,4] btn_judge_progress>"
-					"  <weight=80 btn_judge_start>"
-					"  <weight=80 btn_judge_terminate>"
-					">"
-					"<weight=" + std::to_string(k_above_test_cases) + ">"
-					"<vert gap=" + std::to_string(k_gap_of_test_cases) + " test_cases>"
-					"<weight=" + std::to_string(k_below_test_cases) + ">"
-					"<weight=" + std::to_string(k_btn_add_case) + " btn_add_case>"
-					).c_str()
+				plc_.div(
+					dynamic_cast<std::ostringstream&>(
+						std::ostringstream{} << ""
+						"vert margin=" << k_top_and_bottom << ""
+						"<weight=" << k_exe_path_bar << " margin=[0,0,18,0]"
+						"  <weight=90 label_exe_path>"
+						"  <margin=[0,4,0,0] tb_exe_path>"
+						"  <weight=60 btn_exe_path>"
+						">"
+						"<weight=" << k_judge_bar << " margin=[0,0,6,0]"
+						"  <weight=80 btn_judge_settings>"
+						"  <weight=5%>"
+						"  <margin=[0,4,0,4] btn_judge_progress>"
+						"  <weight=80 btn_judge_start>"
+						"  <weight=80 btn_judge_terminate>"
+						">"
+						"<weight=" << k_above_test_cases << ">"
+						"<vert gap=" << k_gap_of_test_cases << " test_cases>"
+						"<weight=" << k_below_test_cases << ">"
+						"<weight=" << k_btn_add_case << " btn_add_case>"
+						).str().c_str()
 				);
 			}
 
@@ -69,6 +72,7 @@ namespace dscv
 			btn_judge_terminate_.bgcolor(colors::orange);
 
 			events().destroy([this] {
+				// Terminate the process group if running when page being destroyed
 				if (auto ptr = process_wptr_.lock())
 					ptr->terminate();
 			});
@@ -228,6 +232,8 @@ namespace dscv
 
 				_propagate_judging_error(i18n("_msg_judge_launching_processes"));
 
+				// Launch asynchronously, detaching from the main thread.
+				// Warning: never use std::launch(). It will block if it returns std::future.
 				std::thread{ [this, process, program_path] {
 					process->launch(program_path);
 					_show_btn_judge_start();
@@ -238,7 +244,8 @@ namespace dscv
 				_show_btn_judge_start();
 				internationalization i18n;
 				msgbox mb{ i18n("Starting Judgment Failed") };
-				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_1_arg", charset(e.what()).to_bytes(unicode::utf8));
+				mb.icon(msgbox::icon_error);
+				mb << i18n("_msgbox_error_1_arg", charset{ e.what() }.to_bytes(unicode::utf8));
 				mb.show();
 			}
 		}

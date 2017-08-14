@@ -30,21 +30,20 @@ namespace dscv
 				if (!content_panel_)
 					throw std::runtime_error{ "WrapperPanel failed to create the content's instance!" };
 
-				const auto weight_str = std::to_string(k_scrollbar_weight);
-
-				plc_.div((
-					std::string{} + ""
-					"<vert margin=1"
-					"  <"
-					"    <content_panel>"
-					"    <weight=" + weight_str + " scroll_vert>"
-					"  >"
-					"  <weight=" + weight_str + " bottom_bar"
-					"    <scroll_horz>"
-					"    <weight=" + weight_str + " corner>"
-					"  >"
-					">"
-					).c_str()
+				plc_.div(
+					dynamic_cast<std::ostringstream&>(
+						std::ostringstream{} << ""
+						"<vert margin=1"
+						"  <"
+						"    <content_panel>"
+						"    <weight=" << k_scrollbar_weight << " scroll_vert>"
+						"  >"
+						"  <weight=" << k_scrollbar_weight << " bottom_bar"
+						"    <scroll_horz>"
+						"    <weight=" << k_scrollbar_weight << " corner>"
+						"  >"
+						">"
+						).str().c_str()
 				);
 
 				plc_["content_panel"] << *content_panel_;

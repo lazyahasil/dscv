@@ -6,7 +6,7 @@ namespace dscv
 {
 	namespace gui
 	{
-		//! The Base class of page panels into ScrollPanel.
+		//! The base class of page panels into ScrollPanel.
 		class PageBase
 			: public nana::panel<false>, public SideAdaptable<true>
 		{
