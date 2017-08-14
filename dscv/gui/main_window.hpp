@@ -19,7 +19,9 @@ namespace dscv
 
 		private:
 			//! Calls MainWindow's method and nana::place::collocate().
+			//!
 			//! This is needed when the object's lambda deletes itself.
+			//! It prevents dangling reference in lambda. 
 			//! @sa _make_menubar()
 			template <typename FuncReturnT, typename ...FuncArgs, typename ...Args>
 			void _call_and_collocate(FuncReturnT (MainWindow::*functor)(FuncArgs...), Args&&... args)
@@ -28,11 +30,13 @@ namespace dscv
 				plc_.collocate();
 			}
 
+			//! Makes menubar.
 			void _make_menubar();
 
 			nana::place plc_{ *this };
 			
 			//! The menubar panel upside.
+			//!
 			//! It's contained in WrapperPanel because of nana::menubar widget's thickness.\n
 			//! And since it's harsh to rename texts for i18n, it simply re-create the menubar.
 			//! That's why this is in std::unique_ptr<>.

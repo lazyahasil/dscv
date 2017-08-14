@@ -72,6 +72,8 @@ namespace dscv
 				}
 
 				//! Sets the content's size.
+				//!
+				//! @param new_size is applied to the content
 				//! @sa content_height(std::size_t)
 				//! @sa content_width(std::size_t)
 				void content_size(nana::size new_size) noexcept
@@ -95,6 +97,7 @@ namespace dscv
 
 				//! Sets the content's height.
 				//!
+				//! @param new_height is applied to the content
 				//! @sa content_size(nana::size)
 				void content_height(std::size_t new_height) noexcept
 				{
@@ -111,6 +114,7 @@ namespace dscv
 
 				//! Sets the content's width.
 				//!
+				//! @param new_width is applied to the content
 				//! @sa content_size(nana::size)
 				void content_width(std::size_t new_width) noexcept
 				{
@@ -125,8 +129,9 @@ namespace dscv
 					return horz_forced_;
 				}
 
-				//! Determins to force the horizontal scroll bar to show.
+				//! Determines to force the horizontal scroll bar to show.
 				//!
+				//! @param is_forced is whether to force the horizontal scroll bar to show
 				//! @sa forced_vert_bar(bool)
 				void forced_horz_bar(bool is_forced) noexcept
 				{
@@ -143,6 +148,7 @@ namespace dscv
 
 				//! Determins to force the horizontal scroll bar to show.
 				//!
+				//! @param is_forced is whether to force the vertical scroll bar to show
 				//! @sa forced_horz_bar(bool)
 				void forced_vert_bar(bool is_forced) noexcept
 				{
@@ -158,6 +164,7 @@ namespace dscv
 
 				//! Invokes the horizontal scroll bar's make_scroll().
 				//!
+				//! @param is_upward is leftward if true, rightward otherwise
 				//! @sa make_vert_scroll()
 				void make_horz_scroll(bool is_upward)
 				{
@@ -166,6 +173,7 @@ namespace dscv
 
 				//! Invokes the vertical scroll bar's make_scroll().
 				//!
+				//! @param is_upward is upward if true, downward otherwise
 				//! @sa make_horz_scroll()
 				void make_vert_scroll(bool is_upward)
 				{
@@ -190,7 +198,8 @@ namespace dscv
 
 				//! Initiates any ScrollPanel<>.
 				//!
-				//! @param content_panel a valid std::unique_ptr of WrapperPanel<>
+				//! @param content_panel is a valid std::unique_ptr of WrapperPanel<>
+				//! @throws std::runtime_error if content_panel is not valid(nullptr).
 				void _init(std::unique_ptr<ContentPanelBaseType>&& content_panel);
 
 				//! Returns a maximum value of the vertical scroll bar.
@@ -203,15 +212,15 @@ namespace dscv
 
 			private:
 				nana::place plc_{ *this };
-				nana::scroll<false> scroll_horz_{ *this, true };
-				nana::scroll<true> scroll_vert_{ *this, true };
+				nana::scroll<false> scroll_horz_{ *this, true }; //!< Horizontal scroll bar
+				nana::scroll<true> scroll_vert_{ *this, true }; //!< Vertical scroll bar
 
-				bool horz_forced_{ false };
-				bool vert_forced_{ false };
+				bool horz_forced_{ false }; //!< Whether the horizontal bar is forced to show
+				bool vert_forced_{ false }; //!< Whether the vertical bar is forced to show
 
-				std::unique_ptr<ContentPanelBaseType> content_panel_;
-				nana::point content_pos_;
-				nana::size content_size_{ 500, 500 };
+				std::unique_ptr<ContentPanelBaseType> content_panel_; //!< Pointer to the content in WrapperPanelBase
+				nana::point content_pos_; //!< Content's position; it is usually negative
+				nana::size content_size_{ 500, 500 }; //!< Content's size
 			};
 
 			//! The base class of ScrollPanel<ContentT, true>.
@@ -220,10 +229,7 @@ namespace dscv
 			class ScrollPanelForAdaptableBase : public ScrollPanelBase
 			{
 			protected:
-				//! It provides a side-adaptable event interface.
 				class SideAdaptableEventToggle;
-
-				//! It provides a size applying interface.
 				class SideAdaptableSizeApplierBase;
 
 				//! @sa SideAdaptableSizeApplierBase
@@ -240,6 +246,7 @@ namespace dscv
 
 			public:
 				explicit ScrollPanelForAdaptableBase(nana::window wd) : ScrollPanelBase(wd) { }
+
 				ScrollPanelForAdaptableBase() : ScrollPanelForAdaptableBase(nullptr) { }
 
 				virtual void apply_adaptable_side() = 0;
@@ -250,6 +257,7 @@ namespace dscv
 				virtual void side_adaptable(bool is_adaptable) = 0;
 			};
 
+			//! It provides a side-adaptable event interface.
 			class ScrollPanelForAdaptableBase::SideAdaptableEventToggle
 			{
 			public:
@@ -271,6 +279,7 @@ namespace dscv
 				nana::event_handle event_handle_{ nullptr };
 			};
 
+			//! It provides a size applying interface.
 			class ScrollPanelForAdaptableBase::SideAdaptableSizeApplierBase
 			{
 			public:
@@ -334,7 +343,7 @@ namespace dscv
 			};
 		}
 
-		// The scrolling panel for any widget.
+		// The scrolling panel for any widget, which is derived from nana::widget.
 		//!
 		// @sa detail::ScrollPanelBase
 		template <
@@ -343,7 +352,7 @@ namespace dscv
 		>
 		class ScrollPanel;
 
-		//! The scrolling panel for any widget.
+		//! The scrolling panel for any widget, which is NOT derived from SideAdaptable.
 		//!
 		//! ScrollPanel's template specialization which forbids SideAdaptable.
 		//! @sa detail::ScrollPanelBase
@@ -357,6 +366,8 @@ namespace dscv
 			using ContentPanelType = WrapperPanel<false, ContentT>;
 
 		public:
+			//! The constructor.
+			//!
 			//! @param wd the parent's handle
 			//! @param args the arguments forwarded to the content's constructor without the parent's handle
 			//! @throws std::runtime_error if std::make_unique<ContentT>() fails
@@ -376,7 +387,7 @@ namespace dscv
 			}
 		};
 
-		//! The scrolling panel for any widget.
+		//! The scrolling panel for any widget, which is derived from SideAdaptable.
 		//!
 		//! ScrollPanel's template specialization which requires SideAdaptable.
 		//! @sa detail::ScrollPanelBase
@@ -443,8 +454,8 @@ namespace dscv
 			}
 
 		private:
-			std::unique_ptr<SideAdaptableEventToggle> event_toggle_;
-			std::unique_ptr<SideAdaptableSizeApplierType> size_applier_;
+			std::unique_ptr<SideAdaptableEventToggle> event_toggle_; //!< Event toggler interface object
+			std::unique_ptr<SideAdaptableSizeApplierType> size_applier_; //!< Size applier interface object
 		};
 	}
 }

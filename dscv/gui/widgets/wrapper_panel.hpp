@@ -29,7 +29,10 @@ namespace dscv
 					return *content_ptr_.get();
 				}
 
-				// Makes content's height fixed with nana::place.
+				//! Makes content's height fixed with nana::place.
+				//!
+				//! @param fixed_height is a height size to fix
+				//! @sa fix_content_width()
 				void fix_content_height(std::size_t fixed_height)
 				{
 					plc_.div((
@@ -41,7 +44,10 @@ namespace dscv
 					make_content_div();
 				}
 
-				// Makes content's width fixed with nana::place.
+				//! Makes content's width fixed with nana::place.
+				//!
+				//! @param fixed_width is a width size to fix
+				//! @sa fix_content_height()
 				void fix_content_width(std::size_t fixed_width)
 				{
 					plc_.div((
@@ -80,8 +86,8 @@ namespace dscv
 
 			protected:
 				nana::place plc_{ *this };
-				bool div_is_made_{ false };
-				std::unique_ptr<nana::widget> content_ptr_;
+				bool div_is_made_{ false }; //!< Whether the content is displayed by nana::place::div().
+				std::unique_ptr<nana::widget> content_ptr_; //!< Pointer of the content in nana::widget*
 			};
 		}
 
