@@ -1,5 +1,6 @@
 ﻿#include "judge_page.hpp"
 
+#include "judge_page/judge_config_form.hpp"
 #include "../judge/judge_file_writer.hpp"
 
 #include <nana/gui/filebox.hpp>
@@ -32,7 +33,7 @@ namespace dscv
 						"  <weight=60 btn_exe_path>"
 						">"
 						"<weight=" << k_judge_bar << " margin=[0,0,6,0]"
-						"  <weight=80 btn_judge_settings>"
+						"  <weight=100 btn_judge_config>"
 						"  <weight=5%>"
 						"  <margin=[0,4,0,4] btn_judge_progress>"
 						"  <weight=80 btn_judge_start>"
@@ -49,7 +50,7 @@ namespace dscv
 			plc_["label_exe_path"] << label_exe_path_;
 			plc_["tb_exe_path"] << tb_exe_path_;
 			plc_["btn_exe_path"] << btn_exe_path_;
-			plc_["btn_judge_settings"] << btn_judge_settings_;
+			plc_["btn_judge_config"] << btn_judge_config_;
 			plc_["btn_judge_progress"] << btn_judge_progress_;
 			plc_["btn_judge_start"] << btn_judge_start_;
 			plc_["btn_judge_terminate"] << btn_judge_terminate_;
@@ -61,7 +62,7 @@ namespace dscv
 			// Set i18n
 			label_exe_path_.i18n(i18n_eval{ "Program Path" });
 			btn_exe_path_.i18n(i18n_eval{ "Find" });
-			btn_judge_settings_.i18n(i18n_eval{ "Settings" });
+			btn_judge_config_.i18n(i18n_eval{ "Configuration" });
 			btn_judge_start_.i18n(i18n_eval{ "Judge" });
 			btn_judge_terminate_.i18n(i18n_eval{ "Terminate" });
 
@@ -84,6 +85,12 @@ namespace dscv
 				fb.add_filter(i18n("All Files (%arg0)", "*.*"), "*.*");
 				if (fb())
 					tb_exe_path_.caption(fb.file());
+			});
+
+			btn_judge_config_.events().click([this] {
+				JudgeConfigForm w{ *this, *this };
+				w.show();
+				w.wait_for_this();
 			});
 
 			btn_judge_start_.events().click([this] {

@@ -71,7 +71,7 @@ namespace dscv
 			nana::textbox tb_exe_path_{ *this };
 			nana::button btn_exe_path_{ *this };
 
-			nana::button btn_judge_settings_{ *this };
+			nana::button btn_judge_config_{ *this };
 			nana::progress btn_judge_progress_{ *this };
 			nana::button btn_judge_start_{ *this };
 			nana::button btn_judge_terminate_{ *this };

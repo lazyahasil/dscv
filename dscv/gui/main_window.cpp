@@ -13,7 +13,7 @@ namespace dscv
 	{
 		MainWindow::MainWindow(nana::window wd)
 			: form(wd, API::make_center(640, 640),
-				appear::decorate<appear::sizable, appear::minimize, appear::maximize>())
+			  appear::decorate<appear::sizable, appear::minimize, appear::maximize>())
 		{
 			// Set the form window's title
 			caption(std::string{ "DSCV v" } + k_version_str);
@@ -72,15 +72,15 @@ namespace dscv
 			auto& help_m = mbar.push_back(i18n("&Help"));
 #ifdef _DEBUG
 			help_m.append(i18n("Test"), [&](menu::item_proxy& ip) {
-				TestWindow window{ *this };
-				window.show();
-				window.modality();
+				TestWindow w{ *this };
+				w.show();
+				w.modality();
 			});
 #endif
 			help_m.append(i18n("&About..."), [&](menu::item_proxy& ip) {
-				AboutWindow window{ *this };
-				window.show();
-				window.modality();
+				AboutWindow w{ *this };
+				w.show();
+				w.modality();
 			});
 
 			plc_["menubar_panel"] << *menubar_panel_;

@@ -50,7 +50,9 @@ namespace dscv
 
 			//! Korean i18n data
 			constexpr auto k_data_kor = make_array(
+				I18nData{ "Add", u8"추가" },
 				I18nData{ "All Files (%arg0)", u8"모든 파일 (%arg0)" },
+				I18nData{ "Configuration", u8"설정" },
 				I18nData{ "Console Input", u8"콘솔 입력" },
 				I18nData{ "Console Output", u8"콘솔 출력" },
 				I18nData{ "Copy", u8"복사" },
@@ -59,12 +61,14 @@ namespace dscv
 				I18nData{ "Find", u8"찾기" },
 				I18nData{ "Judge", u8"평가하기" },
 				I18nData{ "Judged Process Error", u8"평가 프로세스 오류" },
+				I18nData{ "Judging Configuration", u8"평가 설정" },
 				I18nData{ "Log", u8"로그" },
+				I18nData{ "Modify", u8"수정" },
 				I18nData{ "Paste", u8"붙여넣기" },
 				I18nData{ "Program Path", u8"프로그램 경로" },
+				I18nData{ "Remove", u8"제거" },
 				I18nData{ "Removal", u8"제거" },
 				I18nData{ "Remove Case", u8"케이스 제거" },
-				I18nData{ "Settings", u8"설정" },
 				I18nData{ "Select All", u8"모두 선택" },
 				I18nData{ "Starting Judgment Failed", u8"평가 시작 실패" },
 				I18nData{ "Terminate", u8"강제 종료" },
