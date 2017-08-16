@@ -107,9 +107,6 @@
     <ClInclude Include="gui.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="constants.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="gui\main_window.hpp">
       <Filter>헤더 파일\gui</Filter>
     </ClInclude>
@@ -168,6 +165,9 @@
       <Filter>헤더 파일\gui\judge_page</Filter>
     </ClInclude>
     <ClInclude Include="config_handler.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="version.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

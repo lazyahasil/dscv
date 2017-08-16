@@ -1,6 +1,6 @@
 ﻿#include "main_window.hpp"
 
-#include "../constants.hpp"
+#include "../version.hpp"
 #include "about_window.hpp"
 #include "i18n_helper.hpp"
 #include "test_window.hpp"
@@ -28,8 +28,6 @@ namespace dscv
 			);
 			plc_["judge_page"] << judge_page_;
 
-			// Set i18n
-
 			judge_page_.bgcolor(colors::white);
 			judge_page_.content().set_scroll_panel(judge_page_);
 
@@ -39,7 +37,7 @@ namespace dscv
 			_make_menubar();
 
 			plc_.collocate();
-			// Don't know why, collocate() causes judge_page_ to scroll to 0
+			// Don't know why, collocate() causes judge_page_ to scroll to bottom
 			judge_page_.vert_scroll_to(0);
 		}
 

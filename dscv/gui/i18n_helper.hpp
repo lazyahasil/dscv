@@ -24,6 +24,7 @@ namespace dscv
 			}
 
 			//! Removes i18n data sourced from the I18nData container.
+			//!
 			//! Since Nana doesn't provide i18n removal feature, it simply overwrites msgstr with msgid,
 			//! and loads the English data.
 			template <typename I18nDataContainer>
@@ -47,7 +48,7 @@ namespace dscv
 				I18nData{ "_msg_judge_launching_processes", u8"Launching judged processes..." },
 				I18nData{ "_msg_test_case_asking_removal", u8"Are you sure to remove the test case?\nAny data not saved will be lost!" },
 				I18nData{ "_opt_judge_comp_dont_ignore_consecutive_spaces", u8"Don't ignore consecutive spaces" },
-				I18nData{ "_opt_judge_judging_add_endl_to_test_case_input_end", u8"Add a newline to test case input's end if not existing" }
+				I18nData{ "_opt_judge_judging_add_endl_to_test_case_input_end", u8"Add a newline to end of test case's input if not existing" }
 			);
 
 			//! Korean i18n data
@@ -61,6 +62,7 @@ namespace dscv
 				I18nData{ "Executable File (%arg0)", u8"실행 파일 (%arg0)" },
 				I18nData{ "Error", u8"오류" },
 				I18nData{ "Find", u8"찾기" },
+				I18nData{ "Judge", u8"평가" },
 				I18nData{ "Judged Process Error", u8"평가 프로세스 오류" },
 				I18nData{ "Judging", u8"평가하기" },
 				I18nData{ "Judging Configuration", u8"평가 설정" },
@@ -71,11 +73,13 @@ namespace dscv
 				I18nData{ "Remove", u8"제거" },
 				I18nData{ "Removal", u8"제거" },
 				I18nData{ "Remove Case", u8"케이스 제거" },
+				I18nData{ "Result Comparison", u8"결과 비교" },
 				I18nData{ "Select All", u8"모두 선택" },
 				I18nData{ "Starting Judgment Failed", u8"평가 시작 실패" },
 				I18nData{ "Terminate", u8"강제 종료" },
 				I18nData{ "Test", u8"테스트" },
 				I18nData{ "Test Case %arg0", u8"테스트 케이스 %arg0" },
+				I18nData{ "Test Streams", u8"테스트 스트림" },
 				I18nData{ "&About...", u8"정보...(&A)" },
 				I18nData{ "&Help", u8"도움말(&H)" },
 				I18nData{ "&Language", u8"언어(&L)" },

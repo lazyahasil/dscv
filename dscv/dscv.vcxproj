@@ -175,7 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config_handler.hpp" />
-    <ClInclude Include="constants.hpp" />
+    <ClInclude Include="version.hpp" />
     <ClInclude Include="gui.hpp" />
     <ClInclude Include="gui\about_window.hpp" />
     <ClInclude Include="gui\about_window\license_box.hpp" />

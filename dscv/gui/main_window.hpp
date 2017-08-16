@@ -42,7 +42,7 @@ namespace dscv
 			//! That's why this is in std::unique_ptr<>.
 			std::unique_ptr<WrapperPanel<false, nana::menubar>> menubar_panel_;
 
-			ScrollPanel<JudgePage> judge_page_{ *this };
+			ScrollPanel<JudgePage> judge_page_{ *this, "Judging Set 1" };
 		};
 	}
 }

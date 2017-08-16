@@ -51,6 +51,7 @@ namespace dscv
 				nana::label label_judging_add_endl_to_test_case_input_end_{ grp_judging_ };
 				
 				nana::group grp_comp_{ *this, "", true };
+				nana::label label_comp_sorry_for_incompletion_{ grp_comp_, "Sorry, comparison is WIP." };
 				//! Option whether to not ignore consecutive spaces while comparsion
 				nana::checkbox check_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
 				nana::label label_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };

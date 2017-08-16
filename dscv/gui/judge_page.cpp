@@ -1,6 +1,5 @@
 ﻿#include "judge_page.hpp"
 
-#include "judge_page/judge_config_form.hpp"
 #include "../judge/judge_file_writer.hpp"
 
 #include <nana/gui/filebox.hpp>
@@ -17,7 +16,8 @@ namespace dscv
 	{
 		using namespace judge_page;
 
-		JudgePage::JudgePage(nana::window wd) : PageBase(wd)
+		JudgePage::JudgePage(nana::window wd, const std::string& name)
+			: PageBase(wd), name_(name), judge_config_(_get_config(name))
 		{
 			{
 				using namespace default_v_weights;
@@ -131,7 +131,7 @@ namespace dscv
 
 			// Unlock removal if the size got 2
 			if (test_cases_.size() == 2)
-				test_cases_[0]->content().disable_removal_btn(false);
+				(*test_cases_.begin())->content().disable_removal_btn(false);
 
 			scroll_panel_refresh();
 		}
@@ -264,6 +264,13 @@ namespace dscv
 				auto& tc = wrapper->content();
 				tc.clear_results_and_log();
 			}
+		}
+
+		ConfigHandler::Ptree& JudgePage::_get_config(const std::string& name)
+		{
+			std::ostringstream oss;
+			oss << "dscv.judge." << name;
+			return ConfigHandler::instance().subtree(oss.str());
 		}
 
 		void JudgePage::_handle_judging_error(

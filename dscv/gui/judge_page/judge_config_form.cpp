@@ -11,7 +11,7 @@ namespace dscv
 		namespace judge_page
 		{
 			JudgeConfigForm::JudgeConfigForm(nana::window wd, JudgePage& page)
-				: form(wd, API::make_center(wd, 640, 540), appear::decorate<appear::sizable>()),
+				: form(wd, API::make_center(wd, 640, 480), appear::decorate<appear::sizable>()),
 				  page_ref_(page)
 			{
 				// Set the form window's title
@@ -23,8 +23,9 @@ namespace dscv
 				plc_.div(
 					"margin=5"
 					"<grp_streams>"
-					"<vert weight=280 margin=[0,0,0,5]"
+					"<vert weight=260 margin=[0,0,0,5]"
 					"  <grp_judging>"
+					"  <weight=3>"
 					"  <grp_comp>"
 					">"
 					""
@@ -66,7 +67,7 @@ namespace dscv
 				grp_comp_.caption(
 					dynamic_cast<std::ostringstream&>(
 						std::ostringstream{} << ""
-						"<size=11>" << i18n("Comparison") << "</>"
+						"<size=11>" << i18n("Result Comparison") << "</>"
 						).str().c_str()
 				);
 			}
@@ -121,11 +122,16 @@ namespace dscv
 					"vert margin=10"
 					"<>"
 					"<weight=27 margin=[0,0,5,0]"
+					"  <label_comp_sorry_for_incompletion>"
+					">"
+					"<weight=27 margin=[0,0,5,0]"
 					"  <weight=15 check_comp_dont_ignore_consecutive_spaces>"
 					"  <margin=[0,0,0,3] label_comp_dont_ignore_consecutive_spaces>"
 					">"
 					"<>"
 				);
+				grp_comp_["label_comp_sorry_for_incompletion"]
+					<< label_comp_sorry_for_incompletion_;
 				grp_comp_["check_comp_dont_ignore_consecutive_spaces"]
 					<< check_comp_dont_ignore_consecutive_spaces_;
 				grp_comp_["label_comp_dont_ignore_consecutive_spaces"]

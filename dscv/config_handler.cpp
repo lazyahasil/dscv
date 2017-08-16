@@ -1,6 +1,6 @@
 ﻿#include "config_handler.hpp"
 
-#include "constants.hpp"
+#include "version.hpp"
 
 #include <boost/property_tree/json_parser.hpp>
 
@@ -12,6 +12,19 @@ namespace dscv
 {
 	using namespace config_handler;
 
+	ConfigHandler::Ptree& ConfigHandler::subtree(const std::string& key) noexcept
+	{
+		try
+		{
+			return ptree_.get_child(key);
+		}
+		catch (b_ptree::ptree_bad_path&)
+		{
+			// Make one if not existing
+			return ptree_.put_child(key, b_ptree::ptree{});
+		}
+	}
+
 	void ConfigHandler::read_json()
 	{
 		try
@@ -21,7 +34,7 @@ namespace dscv
 		catch (b_ptree::json_parser_error& e)
 		{
 			_set_version();
-			throw e;
+			throw e; // Error propagation
 		}
 		_set_version();
 	}
