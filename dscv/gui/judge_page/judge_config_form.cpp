@@ -24,19 +24,19 @@ namespace dscv
 					"margin=5"
 					"<grp_streams>"
 					"<vert weight=280 margin=[0,0,0,5]"
-					"  <grp_process>"
-					"  <grp_result_comp>"
+					"  <grp_judging>"
+					"  <grp_comp>"
 					">"
 					""
 				);
 				plc_["grp_streams"] << grp_streams_;
-				plc_["grp_process"] << grp_process_;
-				plc_["grp_result_comp"] << grp_result_comp_;
+				plc_["grp_judging"] << grp_judging_;
+				plc_["grp_comp"] << grp_comp_;
 
 				apply_grp_i18n();
 				_make_grp_streams();
-				_make_grp_process();
-				_make_grp_result_comp();
+				_make_grp_judging();
+				_make_grp_comp();
 
 				plc_.collocate();
 			}
@@ -56,14 +56,14 @@ namespace dscv
 						).str().c_str()
 				);
 
-				grp_process_.caption(
+				grp_judging_.caption(
 					dynamic_cast<std::ostringstream&>(
 						std::ostringstream{} << ""
-						"<size=11>" << i18n("Processes") << "</>"
+						"<size=11>" << i18n("Judging") << "</>"
 						).str().c_str()
 				);
 
-				grp_result_comp_.caption(
+				grp_comp_.caption(
 					dynamic_cast<std::ostringstream&>(
 						std::ostringstream{} << ""
 						"<size=11>" << i18n("Comparison") << "</>"
@@ -71,29 +71,91 @@ namespace dscv
 				);
 			}
 
-			void JudgeConfigForm::_make_grp_process()
+			void JudgeConfigForm::_init_checkbox_and_label(
+				const nana::group& grp, nana::checkbox& checkbox, nana::label& label
+			)
 			{
-				
+				// nana::checkbox::bgcolor() is more efficient than nana::checkbox::transparent().
+				checkbox.bgcolor(grp.bgcolor());
+				API::effects_edge_nimbus(checkbox, effects::edge_nimbus::active);
+				API::tabstop(checkbox);
+
+				label.click_for(checkbox);
+				label.events().click([&checkbox] {
+					checkbox.check(!checkbox.checked());
+				});
 			}
 
-			void JudgeConfigForm::_make_grp_result_comp()
+			void JudgeConfigForm::_make_grp_judging()
 			{
-								
+				grp_judging_.div(
+					"vert margin=10"
+					"<>"
+					"<weight=40 margin=[0,0,5,0]"
+					"  <weight=15 check_judging_add_endl_to_test_case_input_end>"
+					"  <margin=[0,0,0,3] label_judging_add_endl_to_test_case_input_end>"
+					">"
+					"<>"
+				);
+				grp_judging_["check_judging_add_endl_to_test_case_input_end"]
+					<< check_judging_add_endl_to_test_case_input_end_;
+				grp_judging_["label_judging_add_endl_to_test_case_input_end"]
+					<< label_judging_add_endl_to_test_case_input_end_;
+
+				// Set i18n
+				label_judging_add_endl_to_test_case_input_end_.i18n(
+					i18n_eval{ "_opt_judge_judging_add_endl_to_test_case_input_end" });
+
+				_init_checkbox_and_label(
+					grp_judging_,
+					check_judging_add_endl_to_test_case_input_end_,
+					label_judging_add_endl_to_test_case_input_end_
+				);
+
+				grp_judging_.collocate();
+			}
+
+			void JudgeConfigForm::_make_grp_comp()
+			{
+				grp_comp_.div(
+					"vert margin=10"
+					"<>"
+					"<weight=27 margin=[0,0,5,0]"
+					"  <weight=15 check_comp_dont_ignore_consecutive_spaces>"
+					"  <margin=[0,0,0,3] label_comp_dont_ignore_consecutive_spaces>"
+					">"
+					"<>"
+				);
+				grp_comp_["check_comp_dont_ignore_consecutive_spaces"]
+					<< check_comp_dont_ignore_consecutive_spaces_;
+				grp_comp_["label_comp_dont_ignore_consecutive_spaces"]
+					<< label_comp_dont_ignore_consecutive_spaces_;
+
+				// Set i18n
+				label_comp_dont_ignore_consecutive_spaces_.i18n(
+					i18n_eval{ "_opt_judge_comp_dont_ignore_consecutive_spaces" });
+
+				_init_checkbox_and_label(
+					grp_comp_,
+					check_comp_dont_ignore_consecutive_spaces_,
+					label_comp_dont_ignore_consecutive_spaces_
+				);
+
+				grp_comp_.collocate();
 			}
 
 			void JudgeConfigForm::_make_grp_streams()
 			{
 				grp_streams_.div(
-					"<vert margin=10"
-					"  <lb_streams>"
-					"  <weight=30 margin=[5,0,0,0]"
-					"    <margin=[0,5,0,0] btn_add_stream>"
-					"    <margin=[0,5,0,0] btn_modify_stream>"
-					"    <margin=[0,5,0,0] btn_remove_stream>"
-					"    <weight=25 btn_move_up_stream>"
-					"    <weight=5>"
-					"    <weight=25 btn_move_down_stream>"
-					"  >"
+					"vert margin=10"
+					"<lb_streams>"
+					"<weight=30 margin=[5,0,0,0]"
+					"  <margin=[0,5,0,0] btn_add_stream>"
+					"  <margin=[0,5,0,0] btn_modify_stream>"
+					"  <margin=[0,5,0,0] btn_remove_stream>"
+					"  <weight=25 btn_move_up_stream>"
+					"  <weight=5>"
+					"  <weight=25 btn_move_down_stream>"
 					">"
 				);
 				grp_streams_["lb_streams"] << lb_streams_;

@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="config_handler.cpp" />
     <ClCompile Include="gui\about_window.cpp" />
     <ClCompile Include="gui\about_window\license_box.cpp" />
     <ClCompile Include="gui\judge_page.cpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config_handler.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="gui.hpp" />
     <ClInclude Include="gui\about_window.hpp" />

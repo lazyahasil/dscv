@@ -45,7 +45,9 @@ namespace dscv
 				I18nData{ "_msg_error_process_termination_timed_out", u8"Termination was called by time out.(Termination by Time Out)" },
 				I18nData{ "_msg_judge_start", u8"Staring judgment..." },
 				I18nData{ "_msg_judge_launching_processes", u8"Launching judged processes..." },
-				I18nData{ "_msg_test_case_asking_removal", u8"Are you sure to remove the test case?\nAny data not saved will be lost!" }
+				I18nData{ "_msg_test_case_asking_removal", u8"Are you sure to remove the test case?\nAny data not saved will be lost!" },
+				I18nData{ "_opt_judge_comp_dont_ignore_consecutive_spaces", u8"Don't ignore consecutive spaces" },
+				I18nData{ "_opt_judge_judging_add_endl_to_test_case_input_end", u8"Add a newline to test case input's end if not existing" }
 			);
 
 			//! Korean i18n data
@@ -59,8 +61,8 @@ namespace dscv
 				I18nData{ "Executable File (%arg0)", u8"실행 파일 (%arg0)" },
 				I18nData{ "Error", u8"오류" },
 				I18nData{ "Find", u8"찾기" },
-				I18nData{ "Judge", u8"평가하기" },
 				I18nData{ "Judged Process Error", u8"평가 프로세스 오류" },
+				I18nData{ "Judging", u8"평가하기" },
 				I18nData{ "Judging Configuration", u8"평가 설정" },
 				I18nData{ "Log", u8"로그" },
 				I18nData{ "Modify", u8"수정" },
@@ -85,7 +87,9 @@ namespace dscv
 				I18nData{ "_msg_error_process_termination_timed_out", u8"시간 초과로 강제 종료되었습니다.(Termination by Time Out)" },
 				I18nData{ "_msg_judge_start", u8"평가를 시작합니다..." },
 				I18nData{ "_msg_judge_launching_processes", u8"평가 프로세스를 개시합니다..." },
-				I18nData{ "_msg_test_case_asking_removal", u8"해당 케이스를 제거하시겠습니까?\n저장되지 않은 데이터는 사라집니다!" }
+				I18nData{ "_msg_test_case_asking_removal", u8"해당 케이스를 제거하시겠습니까?\n저장되지 않은 데이터는 사라집니다!" },
+				I18nData{ "_opt_judge_comp_dont_ignore_consecutive_spaces", u8"연속된 빈칸을 한 개로 취급하지 않기" },
+				I18nData{ "_opt_judge_judging_add_endl_to_test_case_input_end", u8"테스트 케이스 입력의 끝에 줄바꿈이 없으면 넣기" }
 			);
 		}
 	}

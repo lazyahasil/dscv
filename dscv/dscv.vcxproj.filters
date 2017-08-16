@@ -99,6 +99,9 @@
     <ClCompile Include="gui\judge_page\judge_config_form.cpp">
       <Filter>소스 파일\gui\judge_page</Filter>
     </ClCompile>
+    <ClCompile Include="config_handler.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui.hpp">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="gui\judge_page\judge_config_form.hpp">
       <Filter>헤더 파일\gui\judge_page</Filter>
+    </ClInclude>
+    <ClInclude Include="config_handler.hpp">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
