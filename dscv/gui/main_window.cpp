@@ -2,7 +2,9 @@
 
 #include "../version.hpp"
 #include "about_window.hpp"
+#include "config_gui_helper.hpp"
 #include "i18n_helper.hpp"
+
 #include "test_window.hpp"
 
 using namespace nana;
@@ -84,7 +86,7 @@ namespace dscv
 			i18n_helper::load_language(lang_str);
 			_make_menubar();
 			plc_.collocate();
-			ConfigHandler::instance().write_json();
+			config_gui_helper::write_json_noexcept();
 		}
 	}
 }
