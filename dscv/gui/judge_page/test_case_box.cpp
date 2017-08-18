@@ -5,6 +5,7 @@
 #include <nana/gui/msgbox.hpp>
 
 #include <iomanip>
+#include <sstream>
 
 using namespace nana;
 
@@ -22,29 +23,30 @@ namespace dscv
 				{
 					using namespace test_case_box::default_v_weights;
 
-					plc_.div((
-						std::string{} + ""
-						"vert"
-						"<weight=" + std::to_string(k_title) + ""
-						"  <label_test_case>"
-						"  <weight=100 margin=[4,0,4,0] btn_remove_case>"
-						">"
-						"<"
-						"  <vert"
-						"    <weight=200 stdin_box>"
-						"    <weight=0 in_file_boxes>"
-						"  >"
-						"  <weight=10>"
-						"  <vert"
-						"    <weight=33 margin=[6,0,5,2] label_test_log>"
-						"    <ctb_test_log>"
-						"  >"
-						">"
-						"<weight=" + std::to_string(k_gap_between_in_and_out) + ">"
-						"<weight=200 stdout_box>"
-						"<weight=0 out_file_boxes>"
-						"<weight=0 inout_file_boxes>"
-						).c_str()
+					plc_.div(
+						dynamic_cast<std::ostringstream&>(
+							std::ostringstream{} << ""
+							"vert"
+							"<weight=" << k_title << ""
+							"  <label_test_case>"
+							"  <weight=100 margin=[4,0,4,0] btn_remove_case>"
+							">"
+							"<"
+							"  <vert"
+							"    <weight=200 stdin_box>"
+							"    <weight=0 in_file_boxes>"
+							"  >"
+							"  <weight=10>"
+							"  <vert"
+							"    <weight=33 margin=[6,0,5,2] label_test_log>"
+							"    <ctb_test_log>"
+							"  >"
+							">"
+							"<weight=" << k_gap_between_in_and_out << ">"
+							"<weight=200 stdout_box>"
+							"<weight=0 out_file_boxes>"
+							"<weight=0 inout_file_boxes>"
+							).str().c_str()
 					);
 				}
 
@@ -73,6 +75,8 @@ namespace dscv
 				ctb_test_log_.editable(false);
 				ctb_test_log_.tb().enable_caret();
 
+				plc_.collocate();
+
 				// Initiate min_or_max_vert_scrolled_func
 				scroll_page_func_ = [this](bool is_upward) {
 					page_ref_.scroll_panel_make_vert_scroll(is_upward);
@@ -96,23 +100,21 @@ namespace dscv
 				};
 
 				btn_remove_case_.events().click(removal_func);
-				
-				plc_.collocate();
 			}
 
-			void TestCaseBox::add_text_stream_inout_file(std::size_t pos, const char* filename)
+			void TestCaseBox::add_text_stream_inout_file(std::size_t pos, const std::string& filename)
 			{
 				_add_text_stream_file(inout_file_boxes_, pos,
 					std::make_unique<TestInOutStreamBox>(*this, filename, pos + 1));
 			}
 
-			void TestCaseBox::add_text_stream_in_file(std::size_t pos, const char* filename)
+			void TestCaseBox::add_text_stream_in_file(std::size_t pos, const std::string& filename)
 			{
 				_add_text_stream_file(in_file_boxes_, pos,
 					std::make_unique<TestInStreamBox>(*this, filename, pos + 1));
 			}
 
-			void TestCaseBox::add_text_stream_out_file(std::size_t pos, const char* filename)
+			void TestCaseBox::add_text_stream_out_file(std::size_t pos, const std::string& filename)
 			{
 				_add_text_stream_file(out_file_boxes_, pos,
 					std::make_unique<TestOutStreamBox>(*this, filename, pos + 1));
@@ -300,19 +302,19 @@ namespace dscv
 				for (std::size_t i = 0; i < info.in_files.size(); i++)
 				{
 					if (info.in_files[i].is_text)
-						add_text_stream_in_file(i, info.in_files[i].filename.c_str());
+						add_text_stream_in_file(i, info.in_files[i].filename);
 				}
 
 				for (std::size_t i = 0; i < info.out_files.size(); i++)
 				{
 					if (info.out_files[i].is_text)
-						add_text_stream_out_file(i, info.out_files[i].filename.c_str());
+						add_text_stream_out_file(i, info.out_files[i].filename);
 				}
 
 				for (std::size_t i = 0; i < info.inout_files.size(); i++)
 				{
 					if (info.inout_files[i].is_text)
-						add_text_stream_inout_file(i, info.inout_files[i].filename.c_str());
+						add_text_stream_inout_file(i, info.inout_files[i].filename);
 				}
 
 				return true;

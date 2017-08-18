@@ -1,6 +1,6 @@
 #include "about_window.hpp"
 
-#include "../constants.hpp"
+#include "../version.hpp"
 #include "i18n_helper.hpp"
 
 using namespace nana;

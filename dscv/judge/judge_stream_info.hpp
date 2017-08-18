@@ -7,6 +7,7 @@ namespace dscv
 {
 	namespace judge
 	{
+		//! Going to be eliminated; will be replaced by ConfigHandler::Ptree
 		struct JudgeStreamInfo
 		{
 			struct FileInfo

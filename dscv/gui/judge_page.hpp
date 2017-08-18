@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "judge_page/test_case_box.hpp"
 #include "page_base.hpp"
+#include "judge_page/test_case_box.hpp"
+#include "judge_page/judge_config_form.hpp"
 #include "../judge/judge_process.hpp"
 
 #include <nana/gui/widgets/progress.hpp>
@@ -44,12 +45,21 @@ namespace dscv
 		class JudgePage : public PageBase
 		{
 		public:
-			explicit JudgePage(nana::window wd);
+			JudgePage() = delete;
 
-			JudgePage() : JudgePage(nullptr) { }
+			JudgePage(nana::window wd, const std::string& name);
+
+			explicit JudgePage(const std::string& name) : JudgePage(nullptr, name) { }
 
 			void add_test_case();
+
+			ConfigHandler::Ptree& options_ptree() noexcept
+			{
+				return ConfigHandler::subtree(judge_config_, judge_page::options::k_path_str);
+			}
+
 			std::size_t proper_height() const override;
+
 			bool remove_test_case(std::size_t pos);
 
 			const judge::JudgeStreamInfo& stream_info() const noexcept
@@ -59,11 +69,26 @@ namespace dscv
 
 		private:
 			void _start_judging();
+
 			void _clear_test_case_results();
+
+			//! Returns a ptree reference of configuration.
+			//!
+			//! This method gets name as a parameter because it's called at the constructor's member initializer list.
+			//! @param name identification of this JudgePage
+			ConfigHandler::Ptree& _get_config(const std::string& name);
+
 			void _handle_judging_error(std::size_t case_num, const boost::system::error_code& ec);
+
 			void _propagate_judging_error(const std::string& err_msg);
+
 			void _propagate_judging_error(std::size_t case_num, const std::string& err_msg);
+
 			void _show_btn_judge_start();
+
+			void _write_text_file_for_judge(const std::wstring& dir, const std::string& str, bool forced_endl_at_back);
+
+			std::string name_;
 
 			nana::place plc_{ *this };
 			
@@ -71,7 +96,7 @@ namespace dscv
 			nana::textbox tb_exe_path_{ *this };
 			nana::button btn_exe_path_{ *this };
 
-			nana::button btn_judge_settings_{ *this };
+			nana::button btn_judge_config_{ *this };
 			nana::progress btn_judge_progress_{ *this };
 			nana::button btn_judge_start_{ *this };
 			nana::button btn_judge_terminate_{ *this };
@@ -79,11 +104,13 @@ namespace dscv
 			nana::button btn_add_case_{ *this, "+" };
 			
 			using TestCaseWrapper = WrapperPanel<false, judge_page::TestCaseBox>;
-
 			std::vector<std::unique_ptr<TestCaseWrapper>> test_cases_;
 			std::recursive_mutex test_cases_mutex_;
 
-			judge::JudgeStreamInfo stream_info_;
+			judge::JudgeStreamInfo stream_info_; //!< Going to be eliminated; will be replaced by ConfigHandler::Ptree
+
+			ConfigHandler::Ptree& judge_config_;
+
 			std::weak_ptr<judge::JudgeProcess> process_wptr_;
 			std::chrono::time_point<std::chrono::system_clock> judge_started_time_;
 		};

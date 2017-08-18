@@ -156,9 +156,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="config_handler.cpp" />
     <ClCompile Include="gui\about_window.cpp" />
     <ClCompile Include="gui\about_window\license_box.cpp" />
+    <ClCompile Include="gui\config_gui_helper.cpp" />
+    <ClCompile Include="gui\i18n_helper.cpp" />
     <ClCompile Include="gui\judge_page.cpp" />
+    <ClCompile Include="gui\judge_page\judge_config_form.cpp" />
     <ClCompile Include="gui\judge_page\test_case_box.cpp" />
     <ClCompile Include="gui\judge_page\test_stream_box.cpp" />
     <ClCompile Include="gui\main_window.cpp" />
@@ -172,12 +176,16 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="constants.hpp" />
+    <ClInclude Include="config_handler.hpp" />
+    <ClInclude Include="gui\config_gui_helper.hpp" />
+    <ClInclude Include="gui\i18n_helper\i18n_data.hpp" />
+    <ClInclude Include="version.hpp" />
     <ClInclude Include="gui.hpp" />
     <ClInclude Include="gui\about_window.hpp" />
     <ClInclude Include="gui\about_window\license_box.hpp" />
     <ClInclude Include="gui\i18n_helper.hpp" />
     <ClInclude Include="gui\judge_page.hpp" />
+    <ClInclude Include="gui\judge_page\judge_config_form.hpp" />
     <ClInclude Include="gui\judge_page\test_case_box.hpp" />
     <ClInclude Include="gui\judge_page\test_stream_box.hpp" />
     <ClInclude Include="gui\main_window.hpp" />

@@ -18,6 +18,9 @@ namespace dscv
 
 		void PageBase::scroll_panel_vert_scroll_to_end()
 		{
+			if (!scroll_panel_ptr_)
+				return;
+
 			scroll_panel_ptr_->vert_scroll_to(SIZE_MAX);
 		}
 

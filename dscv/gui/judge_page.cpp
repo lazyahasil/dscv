@@ -6,6 +6,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <sstream>
+
 using namespace nana;
 
 namespace dscv
@@ -14,39 +16,41 @@ namespace dscv
 	{
 		using namespace judge_page;
 
-		JudgePage::JudgePage(nana::window wd) : PageBase(wd)
+		JudgePage::JudgePage(nana::window wd, const std::string& name)
+			: PageBase(wd), name_(name), judge_config_(_get_config(name))
 		{
 			{
 				using namespace default_v_weights;
 				using namespace dynamic_v_weights;
 
-				plc_.div((
-					std::string{} + ""
-					"vert margin=" + std::to_string(k_top_and_bottom) + ""
-					"<weight=" + std::to_string(k_exe_path_bar) + " margin=[0,0,18,0]"
-					"  <weight=90 label_exe_path>"
-					"  <margin=[0,4,0,0] tb_exe_path>"
-					"  <weight=60 btn_exe_path>"
-					">"
-					"<weight=" + std::to_string(k_judge_bar) + " margin=[0,0,6,0]"
-					"  <weight=80 btn_judge_settings>"
-					"  <weight=5%>"
-					"  <margin=[0,4,0,4] btn_judge_progress>"
-					"  <weight=80 btn_judge_start>"
-					"  <weight=80 btn_judge_terminate>"
-					">"
-					"<weight=" + std::to_string(k_above_test_cases) + ">"
-					"<vert gap=" + std::to_string(k_gap_of_test_cases) + " test_cases>"
-					"<weight=" + std::to_string(k_below_test_cases) + ">"
-					"<weight=" + std::to_string(k_btn_add_case) + " btn_add_case>"
-					).c_str()
+				plc_.div(
+					dynamic_cast<std::ostringstream&>(
+						std::ostringstream{} << ""
+						"vert margin=" << k_top_and_bottom << ""
+						"<weight=" << k_exe_path_bar << " margin=[0,0,18,0]"
+						"  <weight=90 label_exe_path>"
+						"  <margin=[0,4,0,0] tb_exe_path>"
+						"  <weight=60 btn_exe_path>"
+						">"
+						"<weight=" << k_judge_bar << " margin=[0,0,6,0]"
+						"  <weight=100 btn_judge_config>"
+						"  <weight=5%>"
+						"  <margin=[0,4,0,4] btn_judge_progress>"
+						"  <weight=80 btn_judge_start>"
+						"  <weight=80 btn_judge_terminate>"
+						">"
+						"<weight=" << k_above_test_cases << ">"
+						"<vert gap=" << k_gap_of_test_cases << " test_cases>"
+						"<weight=" << k_below_test_cases << ">"
+						"<weight=" << k_btn_add_case << " btn_add_case>"
+						).str().c_str()
 				);
 			}
 
 			plc_["label_exe_path"] << label_exe_path_;
 			plc_["tb_exe_path"] << tb_exe_path_;
 			plc_["btn_exe_path"] << btn_exe_path_;
-			plc_["btn_judge_settings"] << btn_judge_settings_;
+			plc_["btn_judge_config"] << btn_judge_config_;
 			plc_["btn_judge_progress"] << btn_judge_progress_;
 			plc_["btn_judge_start"] << btn_judge_start_;
 			plc_["btn_judge_terminate"] << btn_judge_terminate_;
@@ -58,7 +62,7 @@ namespace dscv
 			// Set i18n
 			label_exe_path_.i18n(i18n_eval{ "Program Path" });
 			btn_exe_path_.i18n(i18n_eval{ "Find" });
-			btn_judge_settings_.i18n(i18n_eval{ "Settings" });
+			btn_judge_config_.i18n(i18n_eval{ "Configuration" });
 			btn_judge_start_.i18n(i18n_eval{ "Judge" });
 			btn_judge_terminate_.i18n(i18n_eval{ "Terminate" });
 
@@ -68,7 +72,14 @@ namespace dscv
 			tb_exe_path_.multi_lines(false);
 			btn_judge_terminate_.bgcolor(colors::orange);
 
+			// Make a default test case
+			add_test_case();
+			test_cases_[0]->content().disable_removal_btn(true);
+
+			plc_.collocate();
+
 			events().destroy([this] {
+				// Terminate the process group if running when page being destroyed
 				if (auto ptr = process_wptr_.lock())
 					ptr->terminate();
 			});
@@ -80,6 +91,12 @@ namespace dscv
 				fb.add_filter(i18n("All Files (%arg0)", "*.*"), "*.*");
 				if (fb())
 					tb_exe_path_.caption(fb.file());
+			});
+
+			btn_judge_config_.events().click([this] {
+				JudgeConfigForm w{ *this, *this };
+				w.show();
+				w.wait_for_this();
 			});
 
 			btn_judge_start_.events().click([this] {
@@ -98,12 +115,6 @@ namespace dscv
 				add_test_case();
 				scroll_panel_vert_scroll_to_end();
 			});
-
-			// Make a default test case
-			add_test_case();
-			test_cases_[0]->content().disable_removal_btn(true);
-
-			plc_.collocate();
 		}
 
 		void JudgePage::add_test_case()
@@ -120,7 +131,7 @@ namespace dscv
 
 			// Unlock removal if the size got 2
 			if (test_cases_.size() == 2)
-				test_cases_[0]->content().disable_removal_btn(false);
+				(*test_cases_.begin())->content().disable_removal_btn(false);
 
 			scroll_panel_refresh();
 		}
@@ -186,11 +197,11 @@ namespace dscv
 
 			try
 			{
-				auto program_path = fs::path(tb_exe_path_.caption_wstring());
+				auto program_path = fs::path{ tb_exe_path_.caption_wstring() };
 				if (!fs::exists(program_path))
 					throw std::runtime_error{ "Cannot find the execuatable program!" };
 
-				auto work_path = fs::path(L".dscv/judge/test");
+				auto work_path = fs::path{ L".dscv/judge/test" };
 				if (!fs::exists(work_path) && !fs::create_directories(work_path))
 					throw std::runtime_error{ std::string{ "Cannot create a directory: " } + work_path.string() };
 				
@@ -214,20 +225,42 @@ namespace dscv
 
 					// Get the stdin case text
 					auto stdin_str = tc.text_stream_stdin();
-					//if (!boost::ends_with(stdin_str, "\n")) // If it doesn't end with endl, push one back
-					//	stdin_str.push_back('\n');
+
+					// If input of the test case doesn't end with endl, push one back
+					auto forced_endl_at_back = options_ptree().get(
+						options::k_judging_add_endl_to_test_case_input_end, false);
+
+					if (forced_endl_at_back)
+					{
+						if (!boost::ends_with(stdin_str, "\n"))
+							stdin_str.push_back('\n');
+					}
 
 					process->emplace_back(dir.wstring(), std::move(stdin_str), stdout_handler);
 
 					for (std::size_t i = 0; i < stream_info_.in_files.size(); i++)
-						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_in_file_case(i));
+					{
+						_write_text_file_for_judge(
+							dir.wstring() + std::wstring(charset{ stream_info_.in_files[i].filename }),
+							tc.text_stream_in_file_case(i),
+							forced_endl_at_back
+						);
+					}
 
 					for (std::size_t i = 0; i < stream_info_.inout_files.size(); i++)
-						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_inout_file_case_in(i));
+					{
+						_write_text_file_for_judge(
+							dir.wstring() + std::wstring(charset{ stream_info_.inout_files[i].filename }),
+							tc.text_stream_inout_file_case_in(i),
+							forced_endl_at_back
+						);
+					}
 				}
 
 				_propagate_judging_error(i18n("_msg_judge_launching_processes"));
 
+				// Launch asynchronously, detaching from the main thread.
+				// Warning: never use std::launch(). It will block if it returns std::future.
 				std::thread{ [this, process, program_path] {
 					process->launch(program_path);
 					_show_btn_judge_start();
@@ -238,7 +271,8 @@ namespace dscv
 				_show_btn_judge_start();
 				internationalization i18n;
 				msgbox mb{ i18n("Starting Judgment Failed") };
-				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_1_arg", charset(e.what()).to_bytes(unicode::utf8));
+				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_occurred") << std::endl;
+				mb << charset{ e.what() }.to_bytes(unicode::utf8);
 				mb.show();
 			}
 		}
@@ -250,6 +284,13 @@ namespace dscv
 				auto& tc = wrapper->content();
 				tc.clear_results_and_log();
 			}
+		}
+
+		ConfigHandler::Ptree& JudgePage::_get_config(const std::string& name)
+		{
+			std::ostringstream oss;
+			oss << config_handler::str_path::k_judge_page << "." << name;
+			return ConfigHandler::instance().subtree(oss.str());
 		}
 
 		void JudgePage::_handle_judging_error(
@@ -288,9 +329,7 @@ namespace dscv
 				_propagate_judging_error(str);
 
 				// Launch a msgbox
-				//msgbox mb{ i18n("Judged Process Error") };
-				//mb.icon(msgbox::icon_error) << i18n("_msgbox_error_1_arg", str);
-				//mb.show();
+				// (Removed)
 			}
 		}
 
@@ -319,6 +358,16 @@ namespace dscv
 
 			if (btn_judge_terminate_.focused())
 				btn_judge_start_.focus();
+		}
+
+		void JudgePage::_write_text_file_for_judge(
+			const std::wstring& dir, const std::string& str, bool forced_endl_at_back
+		)
+		{
+			if (forced_endl_at_back && str.back() != '\n' && str.back() != '\r')
+				judge::file_writer::write_text_file(dir, str + '\n');
+			else
+				judge::file_writer::write_text_file(dir, str);
 		}
 	}
 }

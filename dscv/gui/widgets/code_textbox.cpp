@@ -22,7 +22,6 @@ namespace dscv
 			);
 			plc_["line_num"] << line_num_;
 			plc_["textbox"] << textbox_;
-			plc_.collocate();
 
 			line_num_.bgcolor(k_default_line_num_bgcolor);
 			textbox_.borderless(true);
@@ -30,6 +29,8 @@ namespace dscv
 			API::effects_edge_nimbus(textbox_, effects::edge_nimbus::none);
 			API::tabstop(textbox_);
 			API::eat_tabstop(textbox_, false);
+
+			plc_.collocate();
 
 			textbox_.events().mouse_down([this](const arg_mouse& arg) {
 				textbox_.focus();
