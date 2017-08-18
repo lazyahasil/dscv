@@ -62,6 +62,9 @@ namespace dscv
 		//! Applies the language setting got from the ptree.
 		void _apply_language();
 
+		//! Creates folders containing JSON file if not existing.
+		void _create_json_path_if_not_existing();
+
 		Ptree ptree_;
 	};
 }
