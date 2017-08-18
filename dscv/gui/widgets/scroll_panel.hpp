@@ -157,7 +157,7 @@ namespace dscv
 
 				//! Horizontally scrolls to the position.
 				//!
-				//! If you want max(end), just put SIZE_MAX from <climits> since it contains a range check.
+				//! If you want max(end), just put SIZE_MAX from \<climits\> since it contains a range check.
 				//! @param pos the position of the content page
 				//! @sa vert_scroll_to()
 				void horz_scroll_to(std::size_t pos);
@@ -182,7 +182,7 @@ namespace dscv
 
 				//! Vertically scrolls to the position.
 				//!
-				//! If you want max(end), just put SIZE_MAX from <climits> since it contains a range check.
+				//! If you want max(end), just put SIZE_MAX from \<climits\> since it contains a range check.
 				//! @param pos the position of the content page
 				//! @sa horz_scroll_to()
 				void vert_scroll_to(std::size_t pos);

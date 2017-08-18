@@ -28,8 +28,14 @@ namespace dscv
 				std::stringstream ss{ str };
 				std::string buf;
 
+				if (std::getline(ss, buf))
+					file << buf;
 				while (std::getline(ss, buf))
-					file << buf << std::endl;
+					file << std::endl << buf;
+
+				// Check if there's a newline at str's back
+				if (str.back() == '\n' || str.back() == '\r')
+					file << std::endl;
 
 				return true;
 			}

@@ -7,6 +7,8 @@
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
 
+#include "../../config_handler.hpp"
+
 namespace dscv
 {
 	namespace gui
@@ -15,6 +17,15 @@ namespace dscv
 
 		namespace judge_page
 		{
+			namespace options
+			{
+				constexpr const char* k_path_str = "options";
+				constexpr const char* k_judging_add_endl_to_test_case_input_end
+					= "judging_add_endl_to_test_case_input_end";
+				constexpr const char* k_comp_dont_ignore_consecutive_spaces
+					= "comp_dont_ignore_consecutive_spaces";
+			}
+
 			//! The settings window for JudgePage
 			class JudgeConfigForm : public nana::form
 			{
@@ -25,15 +36,19 @@ namespace dscv
 				void apply_grp_i18n();
 
 			private:
-				static void _init_checkbox_and_label(
-					const nana::group& grp, nana::checkbox& checkbox, nana::label& label
+				void _init_checkbox_and_label(
+					const nana::group& grp,
+					nana::checkbox& checkbox,
+					nana::label& label,
+					const std::string& option_str
 				);
 
+				void _load_config();
 				void _make_grp_judging();
 				void _make_grp_comp();
 				void _make_grp_streams();
 
-				JudgePage& page_ref_;
+				ConfigHandler::Ptree& options_ptree_;
 
 				nana::place plc_{ *this };
 

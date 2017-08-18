@@ -56,15 +56,10 @@ namespace dscv
 			tools_m.append(i18n("&Language"));
 			auto* lang_m = tools_m.create_sub_menu(0);
 			lang_m->append(u8"English", [&](menu::item_proxy& ip) {
-				if (internationalization{}.get("_dscv_language") == "ko-kr")
-					i18n_helper::remove_data_sourced(i18n_helper::k_data_kor);
-				CodeTextbox::apply_i18n();
-				_call_and_collocate(&MainWindow::_make_menubar);
+				_set_language_and_refresh_menubar(i18n_helper::lang::k_en_us);
 			});
 			lang_m->append(u8"한국어", [&](menu::item_proxy& ip) {
-				i18n_helper::load_from_data(i18n_helper::k_data_kor);
-				CodeTextbox::apply_i18n();
-				_call_and_collocate(&MainWindow::_make_menubar);
+				_set_language_and_refresh_menubar(i18n_helper::lang::k_ko_kr);
 			});
 
 			auto& help_m = mbar.push_back(i18n("&Help"));
@@ -82,6 +77,14 @@ namespace dscv
 			});
 
 			plc_["menubar_panel"] << *menubar_panel_;
+		}
+
+		void MainWindow::_set_language_and_refresh_menubar(const std::string& lang_str)
+		{
+			i18n_helper::load_language(lang_str);
+			_make_menubar();
+			plc_.collocate();
+			ConfigHandler::instance().write_json();
 		}
 	}
 }

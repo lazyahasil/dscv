@@ -1,8 +1,6 @@
 #include "test_window.hpp"
 
-#include "../config_handler.hpp"
-#include "../version.hpp"
-#include "i18n_helper.hpp"
+#include "config_gui_helper.hpp"
 
 #include <nana/gui/msgbox.hpp>
 
@@ -43,29 +41,11 @@ namespace dscv
 			scroll_pic_.content_size(img.size());
 
 			btn_config_read_json_.events().click([] {
-				try
-				{
-					ConfigHandler::instance().read_json();
-				}
-				catch (ConfigHandler::JsonParserError& e)
-				{
-					msgbox mb{ "Reading JSON Error" };
-					mb.icon(msgbox::icon_error) << e.what();
-					mb.show();
-				}
+				config_gui_helper::read_json_noexcept();
 			});
 
 			btn_config_write_json_.events().click([] {
-				try
-				{
-					ConfigHandler::instance().write_json();
-				}
-				catch (ConfigHandler::JsonParserError& e)
-				{
-					msgbox mb{ "Writing JSON Error" };
-					mb.icon(msgbox::icon_error) << e.what();
-					mb.show();
-				}
+				config_gui_helper::write_json_noexcept();
 			});
 		}
 	}

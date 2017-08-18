@@ -18,20 +18,11 @@ namespace dscv
 			MainWindow() : MainWindow(nullptr) { }
 
 		private:
-			//! Calls MainWindow's method and nana::place::collocate().
-			//!
-			//! This is needed when the object's lambda deletes itself.
-			//! It prevents dangling reference in lambda. 
-			//! @sa _make_menubar()
-			template <typename FuncReturnT, typename ...FuncArgs, typename ...Args>
-			void _call_and_collocate(FuncReturnT (MainWindow::*functor)(FuncArgs...), Args&&... args)
-			{
-				(this->*functor)(std::forward<Args>(args)...);
-				plc_.collocate();
-			}
-
 			//! Makes menubar.
 			void _make_menubar();
+
+			//! Sets language.
+			void _set_language_and_refresh_menubar(const std::string& lang_str);
 
 			nana::place plc_{ *this };
 			

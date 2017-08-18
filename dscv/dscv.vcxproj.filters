@@ -52,6 +52,12 @@
     <Filter Include="헤더 파일\misc">
       <UniqueIdentifier>{cc70f041-5f2a-44e9-81f9-70d6ef956203}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\gui\i18n_helper">
+      <UniqueIdentifier>{07f9c87c-d05f-4c38-9ac5-6bc350ab3f0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\gui\i18n_helper">
+      <UniqueIdentifier>{5f62b399-2920-4740-a825-b06b0e534d6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,6 +107,12 @@
     </ClCompile>
     <ClCompile Include="config_handler.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\i18n_helper.cpp">
+      <Filter>소스 파일\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\config_gui_helper.cpp">
+      <Filter>소스 파일\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,11 +176,17 @@
     <ClInclude Include="gui\judge_page\judge_config_form.hpp">
       <Filter>헤더 파일\gui\judge_page</Filter>
     </ClInclude>
+    <ClInclude Include="version.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\i18n_helper\i18n_data.hpp">
+      <Filter>헤더 파일\gui\i18n_helper</Filter>
+    </ClInclude>
     <ClInclude Include="config_handler.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="version.hpp">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="gui\config_gui_helper.hpp">
+      <Filter>헤더 파일\gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

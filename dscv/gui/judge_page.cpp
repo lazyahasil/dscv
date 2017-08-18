@@ -72,6 +72,12 @@ namespace dscv
 			tb_exe_path_.multi_lines(false);
 			btn_judge_terminate_.bgcolor(colors::orange);
 
+			// Make a default test case
+			add_test_case();
+			test_cases_[0]->content().disable_removal_btn(true);
+
+			plc_.collocate();
+
 			events().destroy([this] {
 				// Terminate the process group if running when page being destroyed
 				if (auto ptr = process_wptr_.lock())
@@ -109,12 +115,6 @@ namespace dscv
 				add_test_case();
 				scroll_panel_vert_scroll_to_end();
 			});
-
-			// Make a default test case
-			add_test_case();
-			test_cases_[0]->content().disable_removal_btn(true);
-
-			plc_.collocate();
 		}
 
 		void JudgePage::add_test_case()
@@ -197,11 +197,11 @@ namespace dscv
 
 			try
 			{
-				auto program_path = fs::path(tb_exe_path_.caption_wstring());
+				auto program_path = fs::path{ tb_exe_path_.caption_wstring() };
 				if (!fs::exists(program_path))
 					throw std::runtime_error{ "Cannot find the execuatable program!" };
 
-				auto work_path = fs::path(L".dscv/judge/test");
+				auto work_path = fs::path{ L".dscv/judge/test" };
 				if (!fs::exists(work_path) && !fs::create_directories(work_path))
 					throw std::runtime_error{ std::string{ "Cannot create a directory: " } + work_path.string() };
 				
@@ -225,16 +225,36 @@ namespace dscv
 
 					// Get the stdin case text
 					auto stdin_str = tc.text_stream_stdin();
-					//if (!boost::ends_with(stdin_str, "\n")) // If it doesn't end with endl, push one back
-					//	stdin_str.push_back('\n');
+
+					// If input of the test case doesn't end with endl, push one back
+					auto forced_endl_at_back = options_ptree().get(
+						options::k_judging_add_endl_to_test_case_input_end, false);
+
+					if (forced_endl_at_back)
+					{
+						if (!boost::ends_with(stdin_str, "\n"))
+							stdin_str.push_back('\n');
+					}
 
 					process->emplace_back(dir.wstring(), std::move(stdin_str), stdout_handler);
 
 					for (std::size_t i = 0; i < stream_info_.in_files.size(); i++)
-						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_in_file_case(i));
+					{
+						_write_text_file_for_judge(
+							dir.wstring() + std::wstring(charset{ stream_info_.in_files[i].filename }),
+							tc.text_stream_in_file_case(i),
+							forced_endl_at_back
+						);
+					}
 
 					for (std::size_t i = 0; i < stream_info_.inout_files.size(); i++)
-						judge::file_writer::write_text_file(dir.wstring(), tc.text_stream_inout_file_case_in(i));
+					{
+						_write_text_file_for_judge(
+							dir.wstring() + std::wstring(charset{ stream_info_.inout_files[i].filename }),
+							tc.text_stream_inout_file_case_in(i),
+							forced_endl_at_back
+						);
+					}
 				}
 
 				_propagate_judging_error(i18n("_msg_judge_launching_processes"));
@@ -251,8 +271,8 @@ namespace dscv
 				_show_btn_judge_start();
 				internationalization i18n;
 				msgbox mb{ i18n("Starting Judgment Failed") };
-				mb.icon(msgbox::icon_error);
-				mb << i18n("_msgbox_error_1_arg", charset{ e.what() }.to_bytes(unicode::utf8));
+				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_occurred") << std::endl;
+				mb << charset{ e.what() }.to_bytes(unicode::utf8);
 				mb.show();
 			}
 		}
@@ -269,7 +289,7 @@ namespace dscv
 		ConfigHandler::Ptree& JudgePage::_get_config(const std::string& name)
 		{
 			std::ostringstream oss;
-			oss << "dscv.judge." << name;
+			oss << config_handler::str_path::k_judge_page << "." << name;
 			return ConfigHandler::instance().subtree(oss.str());
 		}
 
@@ -309,9 +329,7 @@ namespace dscv
 				_propagate_judging_error(str);
 
 				// Launch a msgbox
-				//msgbox mb{ i18n("Judged Process Error") };
-				//mb.icon(msgbox::icon_error) << i18n("_msgbox_error_1_arg", str);
-				//mb.show();
+				// (Removed)
 			}
 		}
 
@@ -340,6 +358,16 @@ namespace dscv
 
 			if (btn_judge_terminate_.focused())
 				btn_judge_start_.focus();
+		}
+
+		void JudgePage::_write_text_file_for_judge(
+			const std::wstring& dir, const std::string& str, bool forced_endl_at_back
+		)
+		{
+			if (forced_endl_at_back && str.back() != '\n' && str.back() != '\r')
+				judge::file_writer::write_text_file(dir, str + '\n');
+			else
+				judge::file_writer::write_text_file(dir, str);
 		}
 	}
 }

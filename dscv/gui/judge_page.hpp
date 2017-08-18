@@ -3,7 +3,6 @@
 #include "page_base.hpp"
 #include "judge_page/test_case_box.hpp"
 #include "judge_page/judge_config_form.hpp"
-#include "../config_handler.hpp"
 #include "../judge/judge_process.hpp"
 
 #include <nana/gui/widgets/progress.hpp>
@@ -54,6 +53,11 @@ namespace dscv
 
 			void add_test_case();
 
+			ConfigHandler::Ptree& options_ptree() noexcept
+			{
+				return ConfigHandler::subtree(judge_config_, judge_page::options::k_path_str);
+			}
+
 			std::size_t proper_height() const override;
 
 			bool remove_test_case(std::size_t pos);
@@ -82,6 +86,8 @@ namespace dscv
 
 			void _show_btn_judge_start();
 
+			void _write_text_file_for_judge(const std::wstring& dir, const std::string& str, bool forced_endl_at_back);
+
 			std::string name_;
 
 			nana::place plc_{ *this };
@@ -101,7 +107,7 @@ namespace dscv
 			std::vector<std::unique_ptr<TestCaseWrapper>> test_cases_;
 			std::recursive_mutex test_cases_mutex_;
 
-			judge::JudgeStreamInfo stream_info_; // Going to be eliminated
+			judge::JudgeStreamInfo stream_info_; //!< Going to be eliminated; will be replaced by ConfigHandler::Ptree
 
 			ConfigHandler::Ptree& judge_config_;
 

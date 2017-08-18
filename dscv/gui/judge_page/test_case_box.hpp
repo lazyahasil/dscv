@@ -40,9 +40,9 @@ namespace dscv
 				TestCaseBox() = delete;
 				TestCaseBox(nana::window wd, JudgePage& page, std::size_t num);
 
-				void add_text_stream_inout_file(std::size_t pos, const char* filename);
-				void add_text_stream_in_file(std::size_t pos, const char* filename);
-				void add_text_stream_out_file(std::size_t pos, const char* filename);
+				void add_text_stream_inout_file(std::size_t pos, const std::string& filename);
+				void add_text_stream_in_file(std::size_t pos, const std::string& filename);
+				void add_text_stream_out_file(std::size_t pos, const std::string& filename);
 				bool add_text_stream_stdin();
 				bool add_text_stream_stdout();
 				bool stream_boxes_empty();
