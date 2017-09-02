@@ -23,10 +23,12 @@ namespace dscv
 
 				WrapperPanelBase() : WrapperPanelBase(nullptr) { }
 
+				virtual ~WrapperPanelBase() { }
+
 				//! Returns its content as nana::widget type.
 				nana::widget& content_widget() const noexcept
 				{
-					return *content_ptr_.get();
+					return *content_ptr_;
 				}
 
 				//! Makes content's height fixed with nana::place.
@@ -123,7 +125,7 @@ namespace dscv
 			//! Returns its content as its own type.
 			ContentT& content() const noexcept
 			{
-				return *dynamic_cast<ContentT*>(content_ptr_.get());
+				return dynamic_cast<ContentT&>(*content_ptr_);
 			}
 		};
 	}

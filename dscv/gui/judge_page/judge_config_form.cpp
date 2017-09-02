@@ -109,8 +109,8 @@ namespace dscv
 
 			void JudgeConfigForm::_load_config()
 			{
-				check_judging_add_endl_to_test_case_input_end_.check(
-					options_ptree_.get(options::k_judging_add_endl_to_test_case_input_end, false)
+				check_judging_force_endl_at_input_end_.check(
+					options_ptree_.get(options::k_judging_force_endl_at_input_end, false)
 				);
 
 				check_comp_dont_ignore_consecutive_spaces_.check(
@@ -124,25 +124,25 @@ namespace dscv
 					"vert margin=10"
 					"<>"
 					"<weight=40 margin=[0,0,5,0]"
-					"  <weight=15 check_judging_add_endl_to_test_case_input_end>"
-					"  <margin=[0,0,0,3] label_judging_add_endl_to_test_case_input_end>"
+					"  <weight=15 check_judging_force_endl_at_input_end>"
+					"  <margin=[0,0,0,3] label_judging_force_endl_at_input_end>"
 					">"
 					"<>"
 				);
-				grp_judging_["check_judging_add_endl_to_test_case_input_end"]
-					<< check_judging_add_endl_to_test_case_input_end_;
-				grp_judging_["label_judging_add_endl_to_test_case_input_end"]
-					<< label_judging_add_endl_to_test_case_input_end_;
+				grp_judging_["check_judging_force_endl_at_input_end"]
+					<< check_judging_force_endl_at_input_end_;
+				grp_judging_["label_judging_force_endl_at_input_end"]
+					<< label_judging_force_endl_at_input_end_;
 
 				// Set i18n
-				label_judging_add_endl_to_test_case_input_end_.i18n(
-					i18n_eval{ "_opt_judge_judging_add_endl_to_test_case_input_end" });
+				label_judging_force_endl_at_input_end_.i18n(
+					i18n_eval{ "_opt_judge_judging_force_endl_at_input_end" });
 
 				_init_checkbox_and_label(
 					grp_judging_,
-					check_judging_add_endl_to_test_case_input_end_,
-					label_judging_add_endl_to_test_case_input_end_,
-					options::k_judging_add_endl_to_test_case_input_end
+					check_judging_force_endl_at_input_end_,
+					label_judging_force_endl_at_input_end_,
+					options::k_judging_force_endl_at_input_end
 				);
 
 				grp_judging_.collocate();

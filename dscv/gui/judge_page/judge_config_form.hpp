@@ -20,8 +20,8 @@ namespace dscv
 			namespace options
 			{
 				constexpr const char* k_path_str = "options";
-				constexpr const char* k_judging_add_endl_to_test_case_input_end
-					= "judging_add_endl_to_test_case_input_end";
+				constexpr const char* k_judging_force_endl_at_input_end
+					= "judging_force_endl_at_input_end";
 				constexpr const char* k_comp_dont_ignore_consecutive_spaces
 					= "comp_dont_ignore_consecutive_spaces";
 			}
@@ -62,8 +62,8 @@ namespace dscv
 
 				nana::group grp_judging_{ *this, "", true };
 				//! Option whether to insert endl to output's end if not existing
-				nana::checkbox check_judging_add_endl_to_test_case_input_end_{ grp_judging_ };
-				nana::label label_judging_add_endl_to_test_case_input_end_{ grp_judging_ };
+				nana::checkbox check_judging_force_endl_at_input_end_{ grp_judging_ };
+				nana::label label_judging_force_endl_at_input_end_{ grp_judging_ };
 				
 				nana::group grp_comp_{ *this, "", true };
 				nana::label label_comp_sorry_for_incompletion_{ grp_comp_, "Sorry, comparison is WIP." };

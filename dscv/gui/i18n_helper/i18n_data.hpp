@@ -44,7 +44,7 @@ namespace dscv
 						I18nData{ "_msg_judge_launching_processes", u8"Launching judged processes..." },
 						I18nData{ "_msg_test_case_asking_removal", u8"Are you sure to remove the test case?\nAny data not saved will be lost!" },
 						I18nData{ "_opt_judge_comp_dont_ignore_consecutive_spaces", u8"Don't ignore consecutive spaces" },
-						I18nData{ "_opt_judge_judging_add_endl_to_test_case_input_end", u8"Add a newline to end of test case's input if not existing" }
+						I18nData{ "_opt_judge_judging_force_endl_at_input_end", u8"Add a newline to end of test case's input if not existing" }
 					);
 
 					//! Korean i18n data
@@ -92,7 +92,7 @@ namespace dscv
 						I18nData{ "_msg_judge_launching_processes", u8"평가 프로세스를 개시합니다..." },
 						I18nData{ "_msg_test_case_asking_removal", u8"해당 케이스를 제거하시겠습니까?\n저장되지 않은 데이터는 사라집니다!" },
 						I18nData{ "_opt_judge_comp_dont_ignore_consecutive_spaces", u8"연속된 빈칸을 한 개로 취급하지 않기" },
-						I18nData{ "_opt_judge_judging_add_endl_to_test_case_input_end", u8"테스트 케이스 입력의 끝에 줄바꿈이 없으면 넣기" }
+						I18nData{ "_opt_judge_judging_force_endl_at_input_end", u8"테스트 케이스 입력의 끝에 줄바꿈이 없으면 넣기" }
 					);
 				}
 

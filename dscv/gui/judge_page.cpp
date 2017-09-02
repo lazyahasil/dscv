@@ -228,7 +228,7 @@ namespace dscv
 
 					// If input of the test case doesn't end with endl, push one back
 					auto forced_endl_at_back = options_ptree().get(
-						options::k_judging_add_endl_to_test_case_input_end, false);
+						options::k_judging_force_endl_at_input_end, false);
 
 					if (forced_endl_at_back)
 					{

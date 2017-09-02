@@ -13,9 +13,7 @@ namespace dscv
 {
 	namespace gui
 	{
-		MainWindow::MainWindow(nana::window wd)
-			: form(wd, API::make_center(640, 640),
-			  appear::decorate<appear::sizable, appear::minimize, appear::maximize>())
+		MainWindow::MainWindow(nana::window wd)	: MainWindowBase(wd)
 		{
 			// Set the form window's title
 			caption(std::string{ "DSCV v" } + k_version_str);
@@ -26,21 +24,33 @@ namespace dscv
 			plc_.div(
 				"vert"
 				"<weight=26 menubar_panel>"
-				"<judge_page>"
+				"<scroll_page>"
 			);
-			plc_["judge_page"] << judge_page_;
 
-			judge_page_.bgcolor(colors::white);
-			judge_page_.content().set_scroll_panel(judge_page_);
-
+			/*judge_page_.bgcolor(colors::white);
+			judge_page_.content().scroll_panel(judge_page_);
 			judge_page_.forced_vert_bar(true);
-			judge_page_.side_adaptable(true);
+			judge_page_.side_adaptable(true);*/
+
+			_add_judge_page("Judge Page 1");
+			plc_["scroll_page"] << **scroll_pages_.begin();
 
 			_make_menubar();
 
 			plc_.collocate();
-			// Don't know why, collocate() causes judge_page_ to scroll to bottom
-			judge_page_.vert_scroll_to(0);
+			// Don't know why, collocate() causes the page to scroll to bottom
+			//judge_page_.vert_scroll_to(0);
+		}
+
+		void MainWindow::_add_judge_page(const std::string& name)
+		{
+			auto sp = std::make_unique<ScrollPanel<JudgePage>>(*this, name);
+			sp->content().main_window(*this);
+			sp->content().scroll_panel(*sp);
+			sp->bgcolor(colors::white);
+			sp->forced_vert_bar(true);
+			sp->side_adaptable(true);
+			scroll_pages_.emplace_back(std::move(sp));
 		}
 
 		void MainWindow::_make_menubar()

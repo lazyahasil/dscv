@@ -7,8 +7,6 @@
 
 #include <nana/gui/widgets/progress.hpp>
 
-#include <mutex>
-
 namespace dscv
 {
 	namespace gui
