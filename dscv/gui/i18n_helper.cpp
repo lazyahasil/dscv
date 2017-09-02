@@ -28,7 +28,7 @@ namespace dscv
 				return cur_lang;
 			}
 
-			bool load_language(const std::string& lang_str)
+			bool load_language(const std::string& lang_str, bool to_update_ptree)
 			{
 				auto cur_lang = current_language();
 
@@ -46,8 +46,11 @@ namespace dscv
 					// Return if the new is English (already overwritten with English)
 					if (lang_str == lang::k_en_us)
 					{
-						ConfigHandler::instance().root().put(config_handler::str_path::k_language, current_language());
+						if (to_update_ptree)
+							ConfigHandler::instance().put_language(lang::k_en_us);
+
 						apply_widgets_i18n();
+
 						return true;
 					}
 				}
@@ -60,8 +63,11 @@ namespace dscv
 				else
 					return false; // Failure
 
-				ConfigHandler::instance().root().put(config_handler::str_path::k_language, current_language());
+				if (to_update_ptree)
+					ConfigHandler::instance().put_language(lang_str);
+
 				apply_widgets_i18n();
+
 				return true;
 			}
 		}

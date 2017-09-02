@@ -53,30 +53,38 @@ namespace dscv
 			auto& mbar = menubar_panel_->content();
 			internationalization i18n;
 
-			auto& tools_m = mbar.push_back(i18n("&Tools"));
+			{
+				auto& tools_m = mbar.push_back(i18n("&Tools"));
+				tools_m.append(i18n("&Language"));
 
-			tools_m.append(i18n("&Language"));
-			auto* lang_m = tools_m.create_sub_menu(0);
-			lang_m->append(u8"English", [&](menu::item_proxy& ip) {
-				_set_language_and_refresh_menubar(i18n_helper::lang::k_en_us);
-			});
-			lang_m->append(u8"한국어", [&](menu::item_proxy& ip) {
-				_set_language_and_refresh_menubar(i18n_helper::lang::k_ko_kr);
-			});
-
-			auto& help_m = mbar.push_back(i18n("&Help"));
+				{
+					auto* lang_m = tools_m.create_sub_menu(0);
+					// English (en-us)
+					lang_m->append(u8"English", [&](menu::item_proxy& ip) {
+						_set_language_and_refresh_menubar(i18n_helper::lang::k_en_us);
+					});
+					// Korean (ko-kr)
+					lang_m->append(u8"한국어", [&](menu::item_proxy& ip) {
+						_set_language_and_refresh_menubar(i18n_helper::lang::k_ko_kr);
+					});
+				}
+			}
+			
+			{
+				auto& help_m = mbar.push_back(i18n("&Help"));
 #ifdef _DEBUG
-			help_m.append(i18n("Test"), [&](menu::item_proxy& ip) {
-				TestWindow w{ *this };
-				w.show();
-				w.modality();
-			});
+				help_m.append(i18n("Test"), [&](menu::item_proxy& ip) {
+					TestWindow w{ *this };
+					w.show();
+					w.modality();
+				});
 #endif
-			help_m.append(i18n("&About..."), [&](menu::item_proxy& ip) {
-				AboutWindow w{ *this };
-				w.show();
-				w.modality();
-			});
+				help_m.append(i18n("&About..."), [&](menu::item_proxy& ip) {
+					AboutWindow w{ *this };
+					w.show();
+					w.modality();
+				});
+			}
 
 			plc_["menubar_panel"] << *menubar_panel_;
 		}

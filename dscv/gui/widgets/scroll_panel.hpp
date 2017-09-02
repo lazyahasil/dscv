@@ -343,9 +343,9 @@ namespace dscv
 			};
 		}
 
-		// The scrolling panel for any widget, which is derived from nana::widget.
+		//! The scrolling panel for any widget, which is derived from nana::widget.
 		//!
-		// @sa detail::ScrollPanelBase
+		//! @sa detail::ScrollPanelBase
 		template <
 			typename ContentT,
 			bool IsSideAdaptableValue = detail::ScrollPanelForAdaptableBase::IsSideAdaptable<ContentT>::value

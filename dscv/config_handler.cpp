@@ -15,6 +15,11 @@ namespace dscv
 {
 	using namespace config_handler;
 
+	void ConfigHandler::put_language(const std::string& lang_str)
+	{
+		ptree_.put(str_path::k_language, lang_str);
+	}
+
 	void ConfigHandler::put_version()
 	{
 		ptree_.put(str_path::k_version, k_version_str);
@@ -28,26 +33,26 @@ namespace dscv
 		{
 			b_ptree::read_json(k_json_path, ptree_);
 		}
-		catch (b_ptree::json_parser_error& e)
+		catch (b_ptree::json_parser_error&)
 		{
 			put_version(); // Correct the version
-			throw e; // Error propagation
+			throw; // Re-throw
 		}
 
 		put_version(); // Correct the version
 		_apply_language();
 	}
 
-	ConfigHandler::Ptree& ConfigHandler::subtree(ConfigHandler::Ptree& some_ptree, const std::string& key) noexcept
+	ConfigHandler::Ptree& ConfigHandler::subtree(ConfigHandler::Ptree& parent, const std::string& key) noexcept
 	{
 		try
 		{
-			return some_ptree.get_child(key);
+			return parent.get_child(key);
 		}
 		catch (b_ptree::ptree_bad_path&)
 		{
 			// Make one if not existing
-			return some_ptree.put_child(key, b_ptree::ptree{});
+			return parent.put_child(key, b_ptree::ptree{});
 		}
 	}
 

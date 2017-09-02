@@ -20,11 +20,18 @@ namespace dscv
 		}
 	}
 
+	//! Contains Boost.PropertyTree for JSON parser
 	class ConfigHandler : public Singleton<ConfigHandler>
 	{
 	public:
 		using Ptree = boost::property_tree::ptree;
 		using JsonParserError = boost::property_tree::json_parser::json_parser_error;
+
+		//! Sets the language infomation at the ptree.
+		//!
+		//! It overwrites if it exists.
+		//! @param lang_str language identifier string 
+		void put_language(const std::string& lang_str);
 
 		//! Sets the version infomation at the ptree.
 		//!
@@ -38,8 +45,21 @@ namespace dscv
 		//! @sa gui::config_gui_helper::read_json_noexcept()
 		void read_json();
 
-		static Ptree& subtree(Ptree& some_ptree, const std::string& key) noexcept;
-
+		//! Returns the subtree from the parent ptree.
+		//!
+		//! Simply, it returns the subtree which is to be created if not existing.
+		//! It tries Ptree::get_child(), and tries Ptree::put_child() if thrown.\n
+		//! Use subtree(const std::string&) for the root.
+		//! @param parent reference of ptree
+		//! @param key path string of subtree
+		//! @sa subtree(const std::string&)
+		static Ptree& subtree(Ptree& parent, const std::string& key) noexcept;
+		
+		//! Returns the subtree from the root.
+		//!
+		//! @param parent reference of Ptree
+		//! @param key path string of subtree
+		//! @sa subtree(Ptree&, const std::string&)
 		Ptree& subtree(const std::string& key) noexcept
 		{
 			return subtree(ptree_, key);
