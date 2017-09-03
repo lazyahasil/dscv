@@ -9,7 +9,6 @@
 #include <iostream>
 
 namespace fs = boost::filesystem;
-namespace b_ptree = boost::property_tree;
 
 namespace dscv
 {
@@ -31,9 +30,9 @@ namespace dscv
 
 		try
 		{
-			b_ptree::read_json(k_json_path, ptree_);
+			boost::property_tree::read_json(k_json_path, ptree_);
 		}
-		catch (b_ptree::json_parser_error&)
+		catch (JsonParserError&)
 		{
 			put_version(); // Correct the version
 			throw; // Re-throw
@@ -49,17 +48,17 @@ namespace dscv
 		{
 			return parent.get_child(key);
 		}
-		catch (b_ptree::ptree_bad_path&)
+		catch (PtreeBadPath&)
 		{
 			// Make one if not existing
-			return parent.put_child(key, b_ptree::ptree{});
+			return parent.put_child(key, Ptree{});
 		}
 	}
 
 	void ConfigHandler::write_json()
 	{
 		_create_json_path_if_not_existing();
-		b_ptree::write_json(k_json_path, ptree_);
+		boost::property_tree::write_json(k_json_path, ptree_);
 	}
 
 	void ConfigHandler::_apply_language()

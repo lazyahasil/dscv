@@ -30,7 +30,6 @@ namespace dscv
 					"  <weight=3>"
 					"  <grp_comp>"
 					">"
-					""
 				);
 				plc_["grp_streams"] << grp_streams_;
 				plc_["grp_judging"] << grp_judging_;
@@ -109,13 +108,19 @@ namespace dscv
 
 			void JudgeConfigPanel::_load_config()
 			{
-				check_judging_force_endl_at_input_end_.check(
-					options_ptree_.get(options::k_judging_force_endl_at_input_end, false)
-				);
+				// Group "judging"
+				{
+					check_judging_force_endl_at_input_end_.check(
+						options_ptree_.get(options::k_judging_force_endl_at_input_end, false)
+					);
+				}
 
-				check_comp_dont_ignore_consecutive_spaces_.check(
-					options_ptree_.get(options::k_comp_dont_ignore_consecutive_spaces, false)
-				);
+				// Group "comp"
+				{
+					check_comp_dont_ignore_consecutive_spaces_.check(
+						options_ptree_.get(options::k_comp_dont_ignore_consecutive_spaces, false)
+					);
+				}
 			}
 
 			void JudgeConfigPanel::_make_grp_judging()
@@ -208,6 +213,14 @@ namespace dscv
 				btn_add_stream_.i18n(i18n_eval{ "Add" });
 				btn_modify_stream_.i18n(i18n_eval{ "Modify" });
 				btn_remove_stream_.i18n(i18n_eval{ "Remove" });
+
+				internationalization i18n;
+
+				lb_streams_.append_header(i18n("Type"));
+				lb_streams_.append_header(i18n("Num"));
+				lb_streams_.append_header(i18n("Stream Info"));
+
+				lb_streams_.sortable(false);
 
 				grp_streams_.collocate();
 			}

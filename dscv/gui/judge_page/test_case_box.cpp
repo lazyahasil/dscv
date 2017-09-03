@@ -1,5 +1,6 @@
 ﻿#include "test_case_box.hpp"
 
+#include "../../judge/judge_stream_info.hpp"
 #include "../judge_page.hpp"
 
 #include <nana/gui/msgbox.hpp>
@@ -11,6 +12,8 @@ using namespace nana;
 
 namespace dscv
 {
+	using namespace judge;
+
 	namespace gui
 	{
 		namespace judge_page
@@ -84,11 +87,11 @@ namespace dscv
 				ctb_test_log_.min_or_max_vert_scrolled_func(scroll_page_func_);
 
 				// Initiate stream boxes
-				_init_streams_from_info(page.stream_info());
+				_init_streams_from_info();
 
 				auto removal_func = [this] {
 					// Show a msgbox if not empty
-					if (!stream_boxes_empty())
+					if (!stream_cases_empty())
 					{
 						internationalization i18n;
 						msgbox mb{ *this, i18n("Test Case %arg0", i18n("Removal")), msgbox::yes_no };
@@ -192,7 +195,7 @@ namespace dscv
 				ctb_test_log_.tb().append(oss.str(), false);
 			}
 
-			bool TestCaseBox::stream_boxes_empty()
+			bool TestCaseBox::stream_cases_empty()
 			{
 				if (stdin_box_ && !stdin_box_->case_empty())
 					return false;
@@ -287,37 +290,38 @@ namespace dscv
 				plc_.modify(fbs.place_str, weight_str.c_str());
 			}
 
-			bool TestCaseBox::_init_streams_from_info(const judge::JudgeStreamInfo& info)
+			void TestCaseBox::_init_streams_from_info()
 			{
-				// Check if there are at least one output files
-				if (!info.has_stdout && info.out_files.empty() && info.inout_files.empty())
-					return false;
+				auto& ptree = page_ref_.streams_ptree();
 
-				if (info.has_stdin)
+				auto has_stdin = ptree.get(judge_stream_info::k_has_stdin, false);
+				auto has_stdout = ptree.get(judge_stream_info::k_has_stdout, false);
+				auto& ptree_in_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_in_files);
+				auto& ptree_out_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_out_files);
+				auto& ptree_inout_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_inout_files);
+				
+				if (has_stdin)
 					add_text_stream_stdin();
 
-				if (info.has_stdout)
+				if (has_stdout)
 					add_text_stream_stdout();
 
-				for (std::size_t i = 0; i < info.in_files.size(); i++)
-				{
-					if (info.in_files[i].is_text)
-						add_text_stream_in_file(i, info.in_files[i].filename);
-				}
+				auto lambda_get_files = [this](
+					const ConfigHandler::Ptree& files_ptree,
+					void(TestCaseBox::*text_adder)(const std::string&)
+					) {
+					for (const auto& val : files_ptree)
+					{
+						auto type = val.second.get_optional<std::string>(judge_stream_info::file_info::k_type);
+						auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
+						if (!type || *type == judge_stream_info::file_types::k_text) // Text stream
+							(this->*text_adder)(filename);
+					}
+				};
 
-				for (std::size_t i = 0; i < info.out_files.size(); i++)
-				{
-					if (info.out_files[i].is_text)
-						add_text_stream_out_file(i, info.out_files[i].filename);
-				}
-
-				for (std::size_t i = 0; i < info.inout_files.size(); i++)
-				{
-					if (info.inout_files[i].is_text)
-						add_text_stream_inout_file(i, info.inout_files[i].filename);
-				}
-
-				return true;
+				lambda_get_files(ptree_in_f, &TestCaseBox::add_text_stream_in_file);
+				lambda_get_files(ptree_out_f, &TestCaseBox::add_text_stream_out_file);
+				lambda_get_files(ptree_inout_f, &TestCaseBox::add_text_stream_inout_file);
 			}
 		}
 	}

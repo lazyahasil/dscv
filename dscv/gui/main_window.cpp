@@ -38,8 +38,10 @@ namespace dscv
 			_make_menubar();
 
 			plc_.collocate();
+
 			// Don't know why, collocate() causes the page to scroll to bottom
-			//judge_page_.vert_scroll_to(0);
+			for (auto& sp : scroll_pages_)
+				sp->vert_scroll_to(0);
 		}
 
 		MainWindow::~MainWindow()

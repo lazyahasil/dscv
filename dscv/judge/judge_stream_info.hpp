@@ -7,20 +7,26 @@ namespace dscv
 {
 	namespace judge
 	{
-		//! Going to be eliminated; will be replaced by ConfigHandler::Ptree
-		struct JudgeStreamInfo
+		//! String constants of JSON path str
+		namespace judge_stream_info
 		{
-			struct FileInfo
-			{
-				bool is_text{ true };
-				std::string filename;
-			};
+			constexpr const char* k_path_str = "streams";
+			constexpr const char* k_array_inout_files = "inout_files";
+			constexpr const char* k_array_in_files = "in_files";
+			constexpr const char* k_array_out_files = "out_files";
+			constexpr const char* k_has_stdin = "has_stdin";
+			constexpr const char* k_has_stdout = "has_stdout";
 
-			bool has_stdin{ true };
-			bool has_stdout{ true };
-			std::vector<FileInfo> in_files;
-			std::vector<FileInfo> out_files;
-			std::vector<FileInfo> inout_files;
-		};
+			namespace file_info
+			{
+				constexpr const char* k_name = "filename";
+				constexpr const char* k_type = "type";
+			}
+
+			namespace file_types
+			{
+				constexpr const char* k_text = "text";
+			}
+		}
 	}
 }

@@ -3,6 +3,7 @@
 #include "misc/singleton.hpp"
 
 #include <boost/optional.hpp>
+#include <boost/property_tree/exceptions.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser/error.hpp>
 
@@ -25,7 +26,11 @@ namespace dscv
 	{
 	public:
 		using Ptree = boost::property_tree::ptree;
+
 		using JsonParserError = boost::property_tree::json_parser::json_parser_error;
+		using PtreeBadData = boost::property_tree::ptree_bad_data;
+		using PtreeBadPath = boost::property_tree::ptree_bad_path;
+		using PtreeError = boost::property_tree::ptree_error;
 
 		//! Sets the language infomation at the ptree.
 		//!

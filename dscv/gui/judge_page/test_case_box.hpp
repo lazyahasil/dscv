@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "../../judge/judge_stream_info.hpp"
 #include "../page_base.hpp"
 #include "test_stream_box.hpp"
 
@@ -41,11 +40,37 @@ namespace dscv
 				TestCaseBox(nana::window wd, JudgePage& page, std::size_t num);
 
 				void add_text_stream_inout_file(std::size_t pos, const std::string& filename);
+
+				void add_text_stream_inout_file(const std::string& filename)
+				{
+					add_text_stream_inout_file(inout_file_boxes_.boxes.size(), filename);
+				}
+
 				void add_text_stream_in_file(std::size_t pos, const std::string& filename);
+
+				void add_text_stream_in_file(const std::string& filename)
+				{
+					add_text_stream_in_file(in_file_boxes_.boxes.size(), filename);
+				}
+
 				void add_text_stream_out_file(std::size_t pos, const std::string& filename);
+
+				void add_text_stream_out_file(const std::string& filename)
+				{
+					add_text_stream_out_file(out_file_boxes_.boxes.size(), filename);
+				}
+
 				bool add_text_stream_stdin();
+
 				bool add_text_stream_stdout();
-				bool stream_boxes_empty();
+
+				bool stream_boxes_empty()
+				{
+					return !stdin_box_ && !stdout_box_ && in_file_boxes_.boxes.empty()
+						&& out_file_boxes_.boxes.empty() && inout_file_boxes_.boxes.empty();
+				}
+
+				bool stream_cases_empty();
 
 				std::size_t case_num() const noexcept
 				{
@@ -108,7 +133,7 @@ namespace dscv
 					FileBoxes& fb, std::size_t pos, std::unique_ptr<TestStreamBoxBase>&& new_box
 				);
 
-				bool _init_streams_from_info(const judge::JudgeStreamInfo& info);
+				void _init_streams_from_info();
 				
 				JudgePage& page_ref_;
 				std::size_t case_num_;

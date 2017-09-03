@@ -13,7 +13,7 @@ namespace dscv
 			caption("Options...");
 
 			// Set minimum window size
-			API::track_window_size(*this, { 200, 100 }, false);
+			API::track_window_size(*this, { 540, 360 }, false);
 
 			plc_.div("<content>");
 
