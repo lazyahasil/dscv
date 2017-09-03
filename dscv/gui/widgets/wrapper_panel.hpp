@@ -23,7 +23,7 @@ namespace dscv
 
 				WrapperPanelBase() : WrapperPanelBase(nullptr) { }
 
-				virtual ~WrapperPanelBase() { }
+				virtual ~WrapperPanelBase() = default;
 
 				//! Returns its content as nana::widget type.
 				nana::widget& content_widget() const noexcept

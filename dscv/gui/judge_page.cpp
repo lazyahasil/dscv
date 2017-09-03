@@ -94,9 +94,10 @@ namespace dscv
 			});
 
 			btn_judge_config_.events().click([this] {
-				JudgeConfigForm w{ *this, *this };
-				w.show();
-				w.wait_for_this();
+				internationalization i18n;
+				std::ostringstream oss;
+				oss << name_ << " " << i18n("Configuration");
+				main_window_config_open<JudgeConfigPanel>(oss.str(), *this);
 			});
 
 			btn_judge_start_.events().click([this] {

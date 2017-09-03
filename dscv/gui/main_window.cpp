@@ -42,6 +42,12 @@ namespace dscv
 			//judge_page_.vert_scroll_to(0);
 		}
 
+		MainWindow::~MainWindow()
+		{
+			// Kill all the pages to prevent using a dangling pointer of MainWindow
+			scroll_pages_.clear();
+		}
+
 		void MainWindow::_add_judge_page(const std::string& name)
 		{
 			auto sp = std::make_unique<ScrollPanel<JudgePage>>(*this, name);

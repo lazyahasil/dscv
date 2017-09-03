@@ -63,7 +63,7 @@ namespace dscv
 
 				ScrollPanelBase() : ScrollPanelBase(nullptr) { }
 
-				virtual ~ScrollPanelBase() { }
+				virtual ~ScrollPanelBase() = default;
 
 				//! Returns the content's size.
 				//!
@@ -252,7 +252,7 @@ namespace dscv
 
 				ScrollPanelForAdaptableBase() : ScrollPanelForAdaptableBase(nullptr) { }
 
-				virtual ~ScrollPanelForAdaptableBase() { }
+				virtual ~ScrollPanelForAdaptableBase() = default;
 
 				virtual void apply_adaptable_side() = 0;
 				virtual void apply_inadaptable_side() = 0;
@@ -292,7 +292,7 @@ namespace dscv
 					: scroll_panel_(scroll_panel)
 				{ }
 
-				virtual ~SideAdaptableSizeApplierBase() { }
+				virtual ~SideAdaptableSizeApplierBase() = default;
 
 				virtual void apply_adaptable_side() = 0;
 				virtual void apply_inadaptable_side() = 0;

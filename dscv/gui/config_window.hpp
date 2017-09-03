@@ -62,14 +62,17 @@ namespace dscv
 
 			std::lock_guard<std::recursive_mutex> lock{ mutex_ };
 
-			content_ptr_ = std::make_unique<ContentT>(*this, std::forward<Args>(args)...);
-			page_ptr_ = page;
+			// Check coincidence of pages old and new
+			if (page_ptr_ == &page)
+				return;
 
+			content_ptr_ = std::make_unique<ContentT>(*this, std::forward<Args>(args)...);
+			page_ptr_ = &page;
 			if (!content_ptr_)
 				throw std::runtime_error{ "ConfigWindow failed to create the content's instance!" };
 
 			// Set place
-			plc_["content"] << content_ptr_;
+			plc_["content"] << *content_ptr_;
 			plc_.collocate();
 		}
 	}

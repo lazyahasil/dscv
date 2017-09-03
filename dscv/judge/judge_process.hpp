@@ -118,6 +118,8 @@ namespace dscv
 					: stdin_pipe(io_service), stdout_pipe(io_service)
 				{ }
 
+				virtual ~ChildItemBase() = default;
+
 				boost::process::async_pipe stdin_pipe; //!< Pipe for stdin output.
 				boost::process::async_pipe stdout_pipe; //!< Pipe for stdout input.
 			};

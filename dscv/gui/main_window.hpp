@@ -19,6 +19,8 @@ namespace dscv
 
 			MainWindow() : MainWindow(nullptr) { }
 
+			~MainWindow();
+
 			//! Returns the ConfigWindow
 			ConfigWindow& config_window() override
 			{

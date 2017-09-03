@@ -34,15 +34,16 @@ namespace dscv
 			//!
 			//! @param title the title of ConfigWindow
 			//! @param args the arguments forwarded to the widget's constructor without the parent's handle
+			//! @throws std::runtime_error if std::make_unique() fails
 			//! @sa MainWindow::open_config_window()
 			template <typename WidgetT, typename ...Args>
-			void main_window_config_open(std::string title, Args&&... args)
+			void main_window_config_open(const std::string& title, Args&&... args)
 			{
 				if (!main_window_ptr_)
 					return;
-				auto config_wd = main_window_ptr_->config_window();
+				auto& config_wd = main_window_ptr_->config_window();
 				config_wd.caption(title);
-				config_wd.content(std::forward<Args>(args)...);
+				config_wd.content<WidgetT>(*this, std::forward<Args>(args)...);
 				config_wd.show();
 			}
 

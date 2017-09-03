@@ -6,6 +6,7 @@
 #include <nana/gui/widgets/group.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
+#include <nana/gui/widgets/panel.hpp>
 
 #include "../../config_handler.hpp"
 
@@ -27,11 +28,13 @@ namespace dscv
 			}
 
 			//! The settings window for JudgePage
-			class JudgeConfigForm : public nana::form
+			class JudgeConfigPanel : public nana::panel<false>
 			{
 			public:
-				JudgeConfigForm() = delete;
-				JudgeConfigForm(nana::window wd, JudgePage& page);
+				JudgeConfigPanel() = delete;
+				JudgeConfigPanel(nana::window wd, JudgePage& page);
+
+				~JudgeConfigPanel();
 
 				void apply_grp_i18n();
 

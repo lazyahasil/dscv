@@ -18,6 +18,16 @@ namespace dscv
 			plc_.div("<content>");
 
 			plc_.collocate();
+
+			events().unload([this](const arg_unload& arg) {
+				// Hide this instead of closing
+				hide();
+				arg.cancel = true;
+				// Clear
+				std::lock_guard<std::recursive_mutex> lock{ mutex_ };
+				page_ptr_ = nullptr;
+				content_ptr_.reset();
+			});
 		}
 
 		void ConfigWindow::prevent_invalid_ref(PageBase& page)
