@@ -60,7 +60,10 @@ namespace dscv
 
 			public:
 				explicit ScrollPanelBase(nana::window wd) : panel<true>(wd) { }
+
 				ScrollPanelBase() : ScrollPanelBase(nullptr) { }
+
+				virtual ~ScrollPanelBase() = default;
 
 				//! Returns the content's size.
 				//!
@@ -81,12 +84,6 @@ namespace dscv
 					content_size_ = new_size;
 				}
 
-				//! Returns its content as nana::widget type.
-				nana::widget& content_widget() const noexcept
-				{
-					return content_panel_->content_widget();
-				}
-
 				//! Returns the content's height.
 				//!
 				//! @sa content_size()
@@ -102,6 +99,12 @@ namespace dscv
 				void content_height(std::size_t new_height) noexcept
 				{
 					content_size_.height = new_height;
+				}
+
+				//! Returns its content as nana::widget type.
+				nana::widget& content_widget() const noexcept
+				{
+					return content_panel_->content_widget();
 				}
 
 				//! Returns the content's width.
@@ -249,6 +252,8 @@ namespace dscv
 
 				ScrollPanelForAdaptableBase() : ScrollPanelForAdaptableBase(nullptr) { }
 
+				virtual ~ScrollPanelForAdaptableBase() = default;
+
 				virtual void apply_adaptable_side() = 0;
 				virtual void apply_inadaptable_side() = 0;
 				std::size_t content_height_for_adaption();
@@ -286,6 +291,8 @@ namespace dscv
 				explicit SideAdaptableSizeApplierBase(ScrollPanelForAdaptableBase& scroll_panel)
 					: scroll_panel_(scroll_panel)
 				{ }
+
+				virtual ~SideAdaptableSizeApplierBase() = default;
 
 				virtual void apply_adaptable_side() = 0;
 				virtual void apply_inadaptable_side() = 0;
@@ -343,9 +350,9 @@ namespace dscv
 			};
 		}
 
-		// The scrolling panel for any widget, which is derived from nana::widget.
+		//! The scrolling panel for any widget, which is derived from nana::widget.
 		//!
-		// @sa detail::ScrollPanelBase
+		//! @sa detail::ScrollPanelBase
 		template <
 			typename ContentT,
 			bool IsSideAdaptableValue = detail::ScrollPanelForAdaptableBase::IsSideAdaptable<ContentT>::value

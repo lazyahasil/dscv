@@ -18,6 +18,8 @@ namespace dscv
 
 				TestStreamBoxBase() : TestStreamBoxBase(nullptr) { }
 
+				virtual ~TestStreamBoxBase() = default;
+
 				virtual bool case_empty() = 0;
 				virtual void set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept = 0;
 				virtual void set_stream_num(std::size_t num) = 0;
@@ -32,6 +34,8 @@ namespace dscv
 				TestInStreamBox(nana::window wd, const std::string& label_str = "", std::size_t num = 0U);
 
 				TestInStreamBox() : TestInStreamBox(nullptr) { }
+
+				virtual ~TestInStreamBox() = default;
 
 				bool case_empty() override;
 
@@ -62,6 +66,8 @@ namespace dscv
 
 				TestOutStreamBox() : TestOutStreamBox(nullptr) { }
 
+				virtual ~TestOutStreamBox() = default;
+
 				virtual void clear_result();
 				void set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept override;
 
@@ -80,6 +86,8 @@ namespace dscv
 				TestInOutStreamBox(nana::window wd, const std::string& label_str = "", std::size_t num = 0U);
 
 				TestInOutStreamBox() : TestInOutStreamBox(nullptr) { }
+
+				virtual ~TestInOutStreamBox() = default;
 
 				bool case_empty() override;
 				void clear_result() override;

@@ -1,6 +1,8 @@
 ﻿#include "judge_page.hpp"
 
+#include "config_gui_helper.hpp"
 #include "../judge/judge_file_writer.hpp"
+#include "../judge/judge_stream_info.hpp"
 
 #include <nana/gui/filebox.hpp>
 
@@ -12,6 +14,8 @@ using namespace nana;
 
 namespace dscv
 {
+	using namespace judge;
+
 	namespace gui
 	{
 		using namespace judge_page;
@@ -72,6 +76,10 @@ namespace dscv
 			tb_exe_path_.multi_lines(false);
 			btn_judge_terminate_.bgcolor(colors::orange);
 
+			// Create streams' information if empty
+			if (_stream_info_empty())
+				_create_default_stream_info();
+
 			// Make a default test case
 			add_test_case();
 			test_cases_[0]->content().disable_removal_btn(true);
@@ -94,9 +102,10 @@ namespace dscv
 			});
 
 			btn_judge_config_.events().click([this] {
-				JudgeConfigForm w{ *this, *this };
-				w.show();
-				w.wait_for_this();
+				internationalization i18n;
+				std::ostringstream oss;
+				oss << name_ << " " << i18n("Configuration");
+				main_window_config_open<JudgeConfigPanel>(oss.str(), *this);
 			});
 
 			btn_judge_start_.events().click([this] {
@@ -134,6 +143,11 @@ namespace dscv
 				(*test_cases_.begin())->content().disable_removal_btn(false);
 
 			scroll_panel_refresh();
+		}
+
+		ConfigHandler::Ptree& JudgePage::options_ptree() noexcept
+		{
+			return ConfigHandler::subtree(judge_config_, judge_page::options::k_path_str);
 		}
 
 		std::size_t JudgePage::proper_height() const
@@ -177,104 +191,9 @@ namespace dscv
 			return true;
 		}
 
-		void JudgePage::_start_judging()
+		ConfigHandler::Ptree& JudgePage::streams_ptree() noexcept
 		{
-			namespace fs = boost::filesystem;
-
-			// Clear results and initiate the time point
-			_clear_test_case_results();
-			judge_started_time_ = std::chrono::system_clock::now();
-
-			internationalization i18n;
-			_propagate_judging_error(i18n("_msg_judge_start"));
-
-			plc_.field_display("btn_judge_start", false);
-			plc_.field_display("btn_judge_terminate", true);
-			plc_.collocate();
-
-			if (btn_judge_start_.focused())
-				btn_judge_terminate_.focus();
-
-			try
-			{
-				auto program_path = fs::path{ tb_exe_path_.caption_wstring() };
-				if (!fs::exists(program_path))
-					throw std::runtime_error{ "Cannot find the execuatable program!" };
-
-				auto work_path = fs::path{ L".dscv/judge/test" };
-				if (!fs::exists(work_path) && !fs::create_directories(work_path))
-					throw std::runtime_error{ std::string{ "Cannot create a directory: " } + work_path.string() };
-				
-				auto process = std::make_shared<judge::JudgeProcess>(
-					[this](std::size_t process_num,	const boost::system::error_code& ec) {
-					_handle_judging_error(process_num, ec);
-				});
-				process_wptr_ = process;
-
-				for (const auto& wrapper : test_cases_)
-				{
-					auto& tc = wrapper->content();
-					auto dir = work_path / std::to_wstring(tc.case_num());
-
-					if (!fs::exists(dir) && !fs::create_directories(dir))
-						throw std::runtime_error{ std::string{ "Cannot create a directory: " } + work_path.string() };
-
-					auto stdout_handler = [&tc](const char* str, std::size_t bytes) {
-						tc.text_stream_stdout_result_append(std::string{ str, bytes });
-					};
-
-					// Get the stdin case text
-					auto stdin_str = tc.text_stream_stdin();
-
-					// If input of the test case doesn't end with endl, push one back
-					auto forced_endl_at_back = options_ptree().get(
-						options::k_judging_add_endl_to_test_case_input_end, false);
-
-					if (forced_endl_at_back)
-					{
-						if (!boost::ends_with(stdin_str, "\n"))
-							stdin_str.push_back('\n');
-					}
-
-					process->emplace_back(dir.wstring(), std::move(stdin_str), stdout_handler);
-
-					for (std::size_t i = 0; i < stream_info_.in_files.size(); i++)
-					{
-						_write_text_file_for_judge(
-							dir.wstring() + std::wstring(charset{ stream_info_.in_files[i].filename }),
-							tc.text_stream_in_file_case(i),
-							forced_endl_at_back
-						);
-					}
-
-					for (std::size_t i = 0; i < stream_info_.inout_files.size(); i++)
-					{
-						_write_text_file_for_judge(
-							dir.wstring() + std::wstring(charset{ stream_info_.inout_files[i].filename }),
-							tc.text_stream_inout_file_case_in(i),
-							forced_endl_at_back
-						);
-					}
-				}
-
-				_propagate_judging_error(i18n("_msg_judge_launching_processes"));
-
-				// Launch asynchronously, detaching from the main thread.
-				// Warning: never use std::launch(). It will block if it returns std::future.
-				std::thread{ [this, process, program_path] {
-					process->launch(program_path);
-					_show_btn_judge_start();
-				} }.detach();
-			}
-			catch (std::exception& e)
-			{
-				_show_btn_judge_start();
-				internationalization i18n;
-				msgbox mb{ i18n("Starting Judgment Failed") };
-				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_occurred") << std::endl;
-				mb << charset{ e.what() }.to_bytes(unicode::utf8);
-				mb.show();
-			}
+			return ConfigHandler::subtree(judge_config_, judge::judge_stream_info::k_path_str);
 		}
 
 		void JudgePage::_clear_test_case_results()
@@ -284,6 +203,18 @@ namespace dscv
 				auto& tc = wrapper->content();
 				tc.clear_results_and_log();
 			}
+		}
+
+		void JudgePage::_create_default_stream_info()
+		{
+			auto& ptree = streams_ptree();
+			ptree.put(judge_stream_info::k_has_stdin, true);
+			ptree.put(judge_stream_info::k_has_stdout, true);
+			ptree.put_child(judge_stream_info::k_array_in_files, ConfigHandler::Ptree{});
+			ptree.put_child(judge_stream_info::k_array_out_files, ConfigHandler::Ptree{});
+			ptree.put_child(judge_stream_info::k_array_inout_files, ConfigHandler::Ptree{});
+			// Write JSON
+			config_gui_helper::write_json_noexcept();
 		}
 
 		ConfigHandler::Ptree& JudgePage::_get_config(const std::string& name)
@@ -323,14 +254,21 @@ namespace dscv
 				else
 					oss << charset{ ec.message() }.to_bytes(unicode::utf8);
 
-				auto str = oss.str();
-
 				// Write a log to all the test cases
-				_propagate_judging_error(str);
+				_propagate_judging_error(oss.str());
 
 				// Launch a msgbox
 				// (Removed)
 			}
+		}
+
+		void JudgePage::_hide_btn_judge_start()
+		{
+			plc_.field_display("btn_judge_start", false);
+			plc_.field_display("btn_judge_terminate", true);
+			plc_.collocate();
+			if (btn_judge_start_.focused())
+				btn_judge_terminate_.focus();
 		}
 
 		void JudgePage::_propagate_judging_error(const std::string& err_msg)
@@ -360,14 +298,152 @@ namespace dscv
 				btn_judge_start_.focus();
 		}
 
+		void JudgePage::_start_judging()
+		{
+			namespace fs = boost::filesystem;
+
+			internationalization i18n;
+
+			// Clear results and initiate the time point
+			_clear_test_case_results();
+			judge_started_time_ = std::chrono::system_clock::now();
+
+			// Push a start message (after clearing)
+			_propagate_judging_error(i18n("_msg_judge_start"));
+
+			// Hide the start button and show the termination button
+			_hide_btn_judge_start();
+
+			try
+			{
+				// Check the executable
+				auto program_path = fs::path{ tb_exe_path_.caption_wstring() };
+				if (!fs::exists(program_path))
+					throw std::runtime_error{ "Cannot find the execuatable program!" };
+
+				// Check the work path
+				auto work_path = fs::path{ L".dscv/judge/test" };
+				if (!fs::exists(work_path) && !fs::create_directories(work_path))
+					throw std::runtime_error{ std::string{ "Cannot create a directory: " } +work_path.string() };
+
+				// Get ptrees of in and inout files
+				auto ptree_in_f = ConfigHandler::subtree(judge_config_, judge_stream_info::k_array_in_files);
+				auto ptree_inout_f = ConfigHandler::subtree(judge_config_, judge_stream_info::k_array_inout_files);
+
+				// Options
+				auto forced_endl_at_back
+					= options_ptree().get(options::k_judging_force_endl_at_input_end, false);
+
+				// Lambda to write input text files
+				auto lambda_text_writer = [this, forced_endl_at_back](
+					const ConfigHandler::Ptree& files_ptree,
+					const std::wstring& dir_wstr,
+					const TestCaseBox& tc,
+					std::string(TestCaseBox::*text_reader)(std::size_t) const
+					) {
+					std::size_t count = 0;
+					for (const auto& val : files_ptree)
+					{
+						auto type = val.second.get_optional<std::string>(judge_stream_info::file_info::k_type);
+						auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
+						if (!type || *type == judge_stream_info::file_types::k_text) // Text stream
+						{
+							_write_text_file_for_judge(
+								dir_wstr + std::wstring(charset{ filename }),
+								(tc.*text_reader)(count),
+								forced_endl_at_back
+							);
+						}
+						count++;
+					}
+				};
+
+				// Create std::shared_ptr of JudgeProcess
+				auto process = std::make_shared<judge::JudgeProcess>(
+					[this](std::size_t process_num, const boost::system::error_code& ec) {
+					_handle_judging_error(process_num, ec);
+				});
+				process_wptr_ = process; // Bind a std::weak_ptr
+
+				for (const auto& wrapper : test_cases_)
+				{
+					auto& tc = wrapper->content();
+					auto dir = work_path / std::to_wstring(tc.case_num());
+
+					if (!fs::exists(dir) && !fs::create_directories(dir))
+						throw std::runtime_error{ std::string{ "Cannot create a directory: " } +work_path.string() };
+
+					auto stdout_handler = [&tc](const char* str, std::size_t bytes) {
+						tc.text_stream_stdout_result_append(std::string{ str, bytes });
+					};
+
+					// Get the stdin case text
+					auto stdin_str = tc.text_stream_stdin();
+
+					// If "forced_endl_at_back" is set and stdin doesn't end with endl, push one back
+					if (forced_endl_at_back && !boost::ends_with(stdin_str, "\n"))
+						stdin_str.push_back('\n');
+
+					// Add a process' data to be judged
+					process->emplace_back(dir.wstring(), std::move(stdin_str), stdout_handler);
+
+					// Write input text files
+					lambda_text_writer(ptree_in_f, dir.wstring(), tc, &TestCaseBox::text_stream_in_file_case);
+					lambda_text_writer(ptree_inout_f, dir.wstring(), tc, &TestCaseBox::text_stream_inout_file_case_in);
+				}
+
+				_propagate_judging_error(i18n("_msg_judge_launching_processes"));
+
+				// Launch asynchronously, detaching from the main thread.
+				// Warning: never use std::launch(). It will block if it returns std::future.
+				std::thread{ [this, process, program_path] {
+					process->launch(program_path);
+					_show_btn_judge_start();
+				} }.detach();
+			}
+			catch (std::exception& e)
+			{
+				_show_btn_judge_start();
+				msgbox mb{ i18n("Starting Judgment Failed") };
+				mb.icon(msgbox::icon_error) << i18n("_msgbox_error_occurred") << std::endl;
+				mb << charset{ e.what() }.to_bytes(unicode::utf8);
+				mb.show();
+			}
+		}
+
+		bool JudgePage::_stream_info_empty() noexcept
+		{
+			try
+			{
+				// If one of Ptree::get_value() or Ptree::get_child() fails, return true
+				const auto& ptree = streams_ptree();
+				auto has_stdin = ptree.get<bool>(judge_stream_info::k_has_stdin);
+				auto has_stdout = ptree.get<bool>(judge_stream_info::k_has_stdout);
+				const auto& ptree_in_f = ptree.get_child(judge_stream_info::k_array_in_files);
+				const auto& ptree_out_f = ptree.get_child(judge_stream_info::k_array_out_files);
+				const auto& ptree_inout_f = ptree.get_child(judge_stream_info::k_array_inout_files);
+
+				// If there's no stream, return true
+				if (!has_stdin && !has_stdout && ptree_in_f.empty() && ptree_out_f.empty() && ptree_inout_f.empty())
+					return true;
+			}
+			catch (ConfigHandler::PtreeError&)
+			{
+				// If the ptree is invalid, return true
+				return true;
+			}
+
+			return false;
+		}
+
 		void JudgePage::_write_text_file_for_judge(
 			const std::wstring& dir, const std::string& str, bool forced_endl_at_back
 		)
 		{
 			if (forced_endl_at_back && str.back() != '\n' && str.back() != '\r')
-				judge::file_writer::write_text_file(dir, str + '\n');
+				file_writer::write_text_file(dir, str + '\n');
 			else
-				judge::file_writer::write_text_file(dir, str);
+				file_writer::write_text_file(dir, str);
 		}
 	}
 }

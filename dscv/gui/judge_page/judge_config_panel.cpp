@@ -1,4 +1,4 @@
-﻿#include "judge_config_form.hpp"
+﻿#include "judge_config_panel.hpp"
 
 #include "../judge_page.hpp"
 #include "../config_gui_helper.hpp"
@@ -13,9 +13,8 @@ namespace dscv
 	{
 		namespace judge_page
 		{
-			JudgeConfigForm::JudgeConfigForm(nana::window wd, JudgePage& page)
-				: form(wd, API::make_center(wd, 640, 480), appear::decorate<appear::sizable>()),
-				  options_ptree_(page.options_ptree())
+			JudgeConfigPanel::JudgeConfigPanel(nana::window wd, JudgePage& page)
+				: panel<false>(wd), options_ptree_(page.options_ptree())
 			{
 				// Set the form window's title
 				this->i18n(i18n_eval{ "Judging Configuration" });
@@ -31,7 +30,6 @@ namespace dscv
 					"  <weight=3>"
 					"  <grp_comp>"
 					">"
-					""
 				);
 				plc_["grp_streams"] << grp_streams_;
 				plc_["grp_judging"] << grp_judging_;
@@ -47,14 +45,15 @@ namespace dscv
 
 				// Load configuration from the ptree
 				_load_config();
-
-				events().unload([] {
-					// Write JSON when unloading
-					config_gui_helper::write_json_noexcept();
-				});
 			}
 
-			void JudgeConfigForm::apply_grp_i18n()
+			JudgeConfigPanel::~JudgeConfigPanel()
+			{
+				// Write JSON when destroying
+				config_gui_helper::write_json_noexcept();
+			}
+
+			void JudgeConfigPanel::apply_grp_i18n()
 			{
 				// In Nana 1.5.4, a string is needed for nana::group's constructor.
 				// Otherwise, nana::group will never be captioned with any other means.
@@ -84,7 +83,7 @@ namespace dscv
 				);
 			}
 
-			void JudgeConfigForm::_init_checkbox_and_label(
+			void JudgeConfigPanel::_init_checkbox_and_label(
 				const nana::group& grp,
 				nana::checkbox& checkbox,
 				nana::label& label,
@@ -107,48 +106,54 @@ namespace dscv
 				});
 			}
 
-			void JudgeConfigForm::_load_config()
+			void JudgeConfigPanel::_load_config()
 			{
-				check_judging_add_endl_to_test_case_input_end_.check(
-					options_ptree_.get(options::k_judging_add_endl_to_test_case_input_end, false)
-				);
+				// Group "judging"
+				{
+					check_judging_force_endl_at_input_end_.check(
+						options_ptree_.get(options::k_judging_force_endl_at_input_end, false)
+					);
+				}
 
-				check_comp_dont_ignore_consecutive_spaces_.check(
-					options_ptree_.get(options::k_comp_dont_ignore_consecutive_spaces, false)
-				);
+				// Group "comp"
+				{
+					check_comp_dont_ignore_consecutive_spaces_.check(
+						options_ptree_.get(options::k_comp_dont_ignore_consecutive_spaces, false)
+					);
+				}
 			}
 
-			void JudgeConfigForm::_make_grp_judging()
+			void JudgeConfigPanel::_make_grp_judging()
 			{
 				grp_judging_.div(
 					"vert margin=10"
 					"<>"
 					"<weight=40 margin=[0,0,5,0]"
-					"  <weight=15 check_judging_add_endl_to_test_case_input_end>"
-					"  <margin=[0,0,0,3] label_judging_add_endl_to_test_case_input_end>"
+					"  <weight=15 check_judging_force_endl_at_input_end>"
+					"  <margin=[0,0,0,3] label_judging_force_endl_at_input_end>"
 					">"
 					"<>"
 				);
-				grp_judging_["check_judging_add_endl_to_test_case_input_end"]
-					<< check_judging_add_endl_to_test_case_input_end_;
-				grp_judging_["label_judging_add_endl_to_test_case_input_end"]
-					<< label_judging_add_endl_to_test_case_input_end_;
+				grp_judging_["check_judging_force_endl_at_input_end"]
+					<< check_judging_force_endl_at_input_end_;
+				grp_judging_["label_judging_force_endl_at_input_end"]
+					<< label_judging_force_endl_at_input_end_;
 
 				// Set i18n
-				label_judging_add_endl_to_test_case_input_end_.i18n(
-					i18n_eval{ "_opt_judge_judging_add_endl_to_test_case_input_end" });
+				label_judging_force_endl_at_input_end_.i18n(
+					i18n_eval{ "_opt_judge_judging_force_endl_at_input_end" });
 
 				_init_checkbox_and_label(
 					grp_judging_,
-					check_judging_add_endl_to_test_case_input_end_,
-					label_judging_add_endl_to_test_case_input_end_,
-					options::k_judging_add_endl_to_test_case_input_end
+					check_judging_force_endl_at_input_end_,
+					label_judging_force_endl_at_input_end_,
+					options::k_judging_force_endl_at_input_end
 				);
 
 				grp_judging_.collocate();
 			}
 
-			void JudgeConfigForm::_make_grp_comp()
+			void JudgeConfigPanel::_make_grp_comp()
 			{
 				grp_comp_.div(
 					"vert margin=10"
@@ -183,7 +188,7 @@ namespace dscv
 				grp_comp_.collocate();
 			}
 
-			void JudgeConfigForm::_make_grp_streams()
+			void JudgeConfigPanel::_make_grp_streams()
 			{
 				grp_streams_.div(
 					"vert margin=10"
@@ -208,6 +213,14 @@ namespace dscv
 				btn_add_stream_.i18n(i18n_eval{ "Add" });
 				btn_modify_stream_.i18n(i18n_eval{ "Modify" });
 				btn_remove_stream_.i18n(i18n_eval{ "Remove" });
+
+				internationalization i18n;
+
+				lb_streams_.append_header(i18n("Type"));
+				lb_streams_.append_header(i18n("Num"));
+				lb_streams_.append_header(i18n("Stream Info"));
+
+				lb_streams_.sortable(false);
 
 				grp_streams_.collocate();
 			}

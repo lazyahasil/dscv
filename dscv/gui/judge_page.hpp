@@ -2,12 +2,10 @@
 
 #include "page_base.hpp"
 #include "judge_page/test_case_box.hpp"
-#include "judge_page/judge_config_form.hpp"
+#include "judge_page/judge_config_panel.hpp"
 #include "../judge/judge_process.hpp"
 
 #include <nana/gui/widgets/progress.hpp>
-
-#include <mutex>
 
 namespace dscv
 {
@@ -53,24 +51,20 @@ namespace dscv
 
 			void add_test_case();
 
-			ConfigHandler::Ptree& options_ptree() noexcept
-			{
-				return ConfigHandler::subtree(judge_config_, judge_page::options::k_path_str);
-			}
+			ConfigHandler::Ptree& options_ptree() noexcept;
 
 			std::size_t proper_height() const override;
 
 			bool remove_test_case(std::size_t pos);
 
-			const judge::JudgeStreamInfo& stream_info() const noexcept
-			{
-				return stream_info_;
-			}
+			ConfigHandler::Ptree& streams_ptree() noexcept;
 
 		private:
 			void _start_judging();
 
 			void _clear_test_case_results();
+
+			void _create_default_stream_info();
 
 			//! Returns a ptree reference of configuration.
 			//!
@@ -80,11 +74,15 @@ namespace dscv
 
 			void _handle_judging_error(std::size_t case_num, const boost::system::error_code& ec);
 
+			void _hide_btn_judge_start();
+
 			void _propagate_judging_error(const std::string& err_msg);
 
 			void _propagate_judging_error(std::size_t case_num, const std::string& err_msg);
 
 			void _show_btn_judge_start();
+
+			bool _stream_info_empty() noexcept;
 
 			void _write_text_file_for_judge(const std::wstring& dir, const std::string& str, bool forced_endl_at_back);
 
@@ -106,8 +104,6 @@ namespace dscv
 			using TestCaseWrapper = WrapperPanel<false, judge_page::TestCaseBox>;
 			std::vector<std::unique_ptr<TestCaseWrapper>> test_cases_;
 			std::recursive_mutex test_cases_mutex_;
-
-			judge::JudgeStreamInfo stream_info_; //!< Going to be eliminated; will be replaced by ConfigHandler::Ptree
 
 			ConfigHandler::Ptree& judge_config_;
 

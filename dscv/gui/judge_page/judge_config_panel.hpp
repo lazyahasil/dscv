@@ -6,6 +6,7 @@
 #include <nana/gui/widgets/group.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
+#include <nana/gui/widgets/panel.hpp>
 
 #include "../../config_handler.hpp"
 
@@ -20,18 +21,20 @@ namespace dscv
 			namespace options
 			{
 				constexpr const char* k_path_str = "options";
-				constexpr const char* k_judging_add_endl_to_test_case_input_end
-					= "judging_add_endl_to_test_case_input_end";
+				constexpr const char* k_judging_force_endl_at_input_end
+					= "judging_force_endl_at_input_end";
 				constexpr const char* k_comp_dont_ignore_consecutive_spaces
 					= "comp_dont_ignore_consecutive_spaces";
 			}
 
 			//! The settings window for JudgePage
-			class JudgeConfigForm : public nana::form
+			class JudgeConfigPanel : public nana::panel<false>
 			{
 			public:
-				JudgeConfigForm() = delete;
-				JudgeConfigForm(nana::window wd, JudgePage& page);
+				JudgeConfigPanel() = delete;
+				JudgeConfigPanel(nana::window wd, JudgePage& page);
+
+				~JudgeConfigPanel();
 
 				void apply_grp_i18n();
 
@@ -62,8 +65,8 @@ namespace dscv
 
 				nana::group grp_judging_{ *this, "", true };
 				//! Option whether to insert endl to output's end if not existing
-				nana::checkbox check_judging_add_endl_to_test_case_input_end_{ grp_judging_ };
-				nana::label label_judging_add_endl_to_test_case_input_end_{ grp_judging_ };
+				nana::checkbox check_judging_force_endl_at_input_end_{ grp_judging_ };
+				nana::label label_judging_force_endl_at_input_end_{ grp_judging_ };
 				
 				nana::group grp_comp_{ *this, "", true };
 				nana::label label_comp_sorry_for_incompletion_{ grp_comp_, "Sorry, comparison is WIP." };
