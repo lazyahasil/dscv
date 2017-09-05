@@ -2,5 +2,5 @@
 
 namespace dscv
 {
-	constexpr char k_version_str[] = "0.13.1";
+	constexpr char k_version_str[] = "0.14.0";
 }
