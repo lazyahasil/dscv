@@ -32,6 +32,8 @@ namespace dscv
 		using PtreeBadPath = boost::property_tree::ptree_bad_path;
 		using PtreeError = boost::property_tree::ptree_error;
 
+		ConfigHandler() = default;
+
 		//! Sets the language infomation at the ptree.
 		//!
 		//! It overwrites if it exists.
@@ -62,7 +64,6 @@ namespace dscv
 		
 		//! Returns the subtree from the root.
 		//!
-		//! @param parent reference of Ptree
 		//! @param key path string of subtree
 		//! @sa subtree(Ptree&, const std::string&)
 		Ptree& subtree(const std::string& key) noexcept

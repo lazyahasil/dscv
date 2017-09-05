@@ -46,7 +46,7 @@ namespace dscv
 				plc_.collocate();
 			}
 
-			void TestInStreamBox::set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept
+			void TestInStreamBox::set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept
 			{
 				ctb_case_.min_or_max_vert_scrolled_func(std::move(functor));
 			}
@@ -79,9 +79,9 @@ namespace dscv
 				ctb_result_.tb().caption("");
 			}
 
-			void TestOutStreamBox::set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept
+			void TestOutStreamBox::set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept
 			{
-				TestInStreamBox::set_min_or_max_vert_scrolled_func(functor);
+				TestInStreamBox::set_min_or_max_vert_scrolled_func(std::move(functor));
 				ctb_result_.min_or_max_vert_scrolled_func(std::move(functor));
 			}
 
@@ -103,9 +103,9 @@ namespace dscv
 				ctb_case_out_.tb().caption("");
 			}
 
-			void TestInOutStreamBox::set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept
+			void TestInOutStreamBox::set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept
 			{
-				TestOutStreamBox::set_min_or_max_vert_scrolled_func(functor);
+				TestOutStreamBox::set_min_or_max_vert_scrolled_func(std::move(functor));
 				ctb_case_out_.min_or_max_vert_scrolled_func(std::move(functor));
 			}
 		}

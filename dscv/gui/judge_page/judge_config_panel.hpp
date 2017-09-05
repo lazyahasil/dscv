@@ -36,9 +36,19 @@ namespace dscv
 
 				~JudgeConfigPanel();
 
+				//! Applies i18n to all the group.
 				void apply_grp_i18n();
 
 			private:
+				//! Initiates a option pair of a checkbox and a label in the same group.
+				//!
+				//! This was made since this is a common trifle for every checkbox and label of every option in
+				//! every group.\n
+				//! By this, appearance settings, mutual binding and adding events are done.
+				//! @param grp the group which contains the checkbox and the label
+				//! @param checkbox nana::checkbox widget of the option
+				//! @param label nana::label widget of the option
+				//! @param option_str option string for the ptree
 				void _init_checkbox_and_label(
 					const nana::group& grp,
 					nana::checkbox& checkbox,
@@ -46,8 +56,13 @@ namespace dscv
 					const std::string& option_str
 				);
 
+				//! Loads configurations from the ptree into widgets.
 				void _load_config();
+
+				//! Makes the group "judging".
 				void _make_grp_judging();
+
+				//! Makes the group "comp".
 				void _make_grp_comp();
 				void _make_grp_streams();
 
@@ -64,14 +79,18 @@ namespace dscv
 				nana::button btn_move_down_stream_{ grp_streams_, u8"\u2b07" };
 
 				nana::group grp_judging_{ *this, "", true };
+
 				//! Option whether to insert endl to output's end if not existing
 				nana::checkbox check_judging_force_endl_at_input_end_{ grp_judging_ };
+				//! Option whether to insert endl to output's end if not existing
 				nana::label label_judging_force_endl_at_input_end_{ grp_judging_ };
 				
 				nana::group grp_comp_{ *this, "", true };
 				nana::label label_comp_sorry_for_incompletion_{ grp_comp_, "Sorry, comparison is WIP." };
+
 				//! Option whether to not ignore consecutive spaces while comparsion
 				nana::checkbox check_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
+				//! Option whether to not ignore consecutive spaces while comparsion
 				nana::label label_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
 			};
 		}

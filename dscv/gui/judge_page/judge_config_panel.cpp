@@ -95,7 +95,7 @@ namespace dscv
 				API::effects_edge_nimbus(checkbox, effects::edge_nimbus::active);
 				API::tabstop(checkbox);
 				
-				// Bind the checkbox with config_ptree_
+				// Bind the checkbox with options_ptree_
 				checkbox.events().checked([this, option_str](const arg_checkbox& arg) {
 					options_ptree_.put(option_str, arg.widget->checked());
 				});

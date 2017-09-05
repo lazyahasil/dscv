@@ -21,7 +21,9 @@ namespace dscv
 				virtual ~TestStreamBoxBase() = default;
 
 				virtual bool case_empty() = 0;
-				virtual void set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept = 0;
+
+				virtual void set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept = 0;
+
 				virtual void set_stream_num(std::size_t num) = 0;
 
 			protected:
@@ -44,7 +46,8 @@ namespace dscv
 					label_name_.i18n(std::move(eval));
 				}
 
-				void set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept override;
+				void set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept override;
+
 				void set_stream_num(std::size_t num) override;
 
 				std::string text_case() const noexcept
@@ -69,7 +72,8 @@ namespace dscv
 				virtual ~TestOutStreamBox() = default;
 
 				virtual void clear_result();
-				void set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept override;
+
+				void set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept override;
 
 				void text_result_append(const std::string& str)
 				{
@@ -90,8 +94,10 @@ namespace dscv
 				virtual ~TestInOutStreamBox() = default;
 
 				bool case_empty() override;
+
 				void clear_result() override;
-				void set_min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept override;
+
+				void set_min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept override;
 
 				std::string text_case_out() const noexcept
 				{

@@ -24,6 +24,7 @@ namespace dscv
 
 			//! Creates the content from arguments.
 			//!
+			//! @param page reference to the JudgePage
 			//! @param args the arguments forwarded to the content's constructor without the parent's handle
 			//! @throws std::runtime_error if std::make_unique<ContentT>() fails
 			template <typename ContentT, typename ...Args>
@@ -39,11 +40,17 @@ namespace dscv
 				return *content_ptr_;
 			}
 
+			//! Returns whether the page is empty.
 			bool page_empty()
 			{
 				return !page_ptr_;
 			}
 
+			//! Nullifies the reference if the page matches.
+			//!
+			//! Must be aware that JudgePage calls this method.
+			//! If this ConfigWindow is destroyed earlier, JudgePage's destructor may use its dangling pointer to this.
+			//! @page reference to the JudgePage which is destroying
 			void prevent_invalid_ref(PageBase& page);
 
 		private:

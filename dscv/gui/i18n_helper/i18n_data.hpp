@@ -62,7 +62,6 @@ namespace dscv
 						I18nData{ "Judge", u8"평가" },
 						I18nData{ "Judged Process Error", u8"평가 프로세스 오류" },
 						I18nData{ "Judging", u8"평가하기" },
-						I18nData{ "Judging Configuration", u8"평가 설정" },
 						I18nData{ "JSON Parsing Error", u8"JSON 구문 오류" },
 						I18nData{ "Log", u8"로그" },
 						I18nData{ "Modify", u8"수정" },

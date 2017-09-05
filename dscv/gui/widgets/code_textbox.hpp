@@ -35,34 +35,59 @@ namespace dscv
 
 			CodeTextbox() : CodeTextbox(nullptr) { }
 
+			CodeTextbox(const CodeTextbox&) = delete;
+			CodeTextbox& operator=(const CodeTextbox&) = delete;
+
 			~CodeTextbox();
 
+			//! Invokes nana::textbox::copy().
 			void action_copy();
+
+			//! Invokes nana::textbox::paste().
 			void action_paste();
 
+			//! Invokes nana::textbox::select(bool).
 			void action_select_all()
 			{
 				textbox_.select(true);
 			}
 
+			//! Applies i18n to CodeTextbox::CodeTextboxPopupMenu.
 			static void apply_i18n();
 
+			//! Returns whether the textbox is editable.
 			bool editable() const noexcept
 			{
 				return textbox_.editable();
 			}
 
+			//! Toggles whether it's editable by a boolean.
+			//!
+			//! @param is_editable whether to make it editable or not
 			void editable(bool is_editable);
 
-			void min_or_max_vert_scrolled_func(std::function<void(bool)> functor) noexcept;
-			void line_num_bgcolor_func(std::function<nana::color(std::size_t)> functor) noexcept;
-			void line_num_fgcolor_func(std::function<nana::color(std::size_t)> functor) noexcept;
+			//! Sets the function which is called when vertically scrolled to the end.
+			//!
+			//! @param functor std::function object
+			void min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept;
 
+			//! Sets the function which decides background colors of line numbers.
+			//!
+			//! @param functor std::function object
+			void line_num_bgcolor_func(std::function<nana::color(std::size_t)>&& functor) noexcept;
+
+			//! Sets the function which decides foreground colors of line numbers.
+			//!
+			//! @param functor std::function object
+			void line_num_fgcolor_func(std::function<nana::color(std::size_t)>&& functor) noexcept;
+
+			//! Returns a reference to the textbox
 			nana::textbox& tb() noexcept
 			{
 				return textbox_;
 			}
 
+			//! Returns a const reference to the textbox
 			const nana::textbox& tb() const noexcept
 			{
 				return textbox_;
@@ -93,8 +118,18 @@ namespace dscv
 			CodeTextboxPopupMenu(const CodeTextboxPopupMenu&) = delete;
 			CodeTextboxPopupMenu& operator=(const CodeTextboxPopupMenu&) = delete;
 
+			//! Applies i18n.
 			void apply_i18n();
+
+			//! Opens the menu.
+			//!
+			//! @param ctb reference to the CodeTextbox
+			//! @param mouse nana::arg_mouse object which is passed on the mouse_down event
 			void open_menu(CodeTextbox& ctb, const nana::arg_mouse& mouse);
+
+			//! Nullifies the reference if the CodeTextbox matches.
+			//!
+			//! @ctb reference to the CodeTextbox which is destroying
 			void prevent_invalid_ref(const CodeTextbox& ctb) noexcept;
 
 		private:
