@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "page_base.hpp"
 #include "judge_page/test_case_box.hpp"
 #include "judge_page/judge_config_panel.hpp"
 #include "../judge/judge_process.hpp"

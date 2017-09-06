@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "config_gui_helper.hpp"
-
 namespace dscv
 {
 	namespace gui

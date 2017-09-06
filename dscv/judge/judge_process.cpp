@@ -91,17 +91,6 @@ namespace dscv
 			}
 		}
 
-		JudgeProcess::JudgeProcess(
-			std::initializer_list<JudgeProcessData> processes_data,
-			std::function<ErrorHandler>&& log_handler
-		) : log_handler_(std::move(log_handler))
-		{
-			processes_.reserve(processes_data.size());
-			std::size_t num = 1;
-			for (const auto& d : processes_data)
-				processes_.emplace_back(std::make_unique<detail::JudgeProcessUnit>(*this, num++, d));
-		}
-
 		bool JudgeProcess::launch(
 			const boost::filesystem::path& program_path,
 			const boost::process::wenvironment& env

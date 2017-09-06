@@ -165,23 +165,6 @@ namespace dscv
 			textbox_.enable_caret();
 		}
 
-		void CodeTextbox::min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept
-		{
-			min_or_max_vert_scrolled_func_ = std::move(functor);
-		}
-
-		void CodeTextbox::line_num_bgcolor_func(std::function<nana::color(std::size_t)>&& functor) noexcept
-		{
-			line_num_bgcolor_func_ = std::move(functor);
-			line_num_panel_bgcolor_ = line_num_bgcolor_func_(0);
-			line_num_.bgcolor(line_num_panel_bgcolor_);
-		}
-
-		void CodeTextbox::line_num_fgcolor_func(std::function<nana::color(std::size_t)>&& functor) noexcept
-		{
-			line_num_fgcolor_func_ = std::move(functor);
-		}
-
 		CodeTextbox::CodeTextboxPopupMenu::CodeTextboxPopupMenu()
 		{
 			append("", [this](menu::item_proxy& ip) {

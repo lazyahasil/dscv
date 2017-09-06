@@ -18,15 +18,15 @@ namespace dscv
 		{
 			JudgeProcessData() = delete;
 
-			template <typename WStringT, typename StringT>
+			template <typename WStringT, typename StringT, typename FunctorT>
 			JudgeProcessData(
 				WStringT&& _dir_overload,
 				StringT&& _stdin_str,
-				std::function<StdoutHandler>&& _stdout_handler
+				FunctorT&& _stdout_handler
 			)
 				: dir_overload(std::forward<WStringT>(_dir_overload)),
 				  stdin_str(std::forward<StringT>(_stdin_str)),
-				  stdout_handler(std::move(_stdout_handler))
+				  stdout_handler(std::forward<FunctorT>(_stdout_handler))
 			{ }
 
 			std::wstring dir_overload; //!< Working directory for the process
@@ -161,18 +161,26 @@ namespace dscv
 			//! The constructor.
 			//!
 			//! @param log_handler Log handler function object
-			explicit JudgeProcess(std::function<ErrorHandler>&& log_handler)
-				: log_handler_(std::move(log_handler))
+			template <typename FunctorT>
+			explicit JudgeProcess(FunctorT&& log_handler)
+				: log_handler_(std::forward<FunctorT>(log_handler))
 			{ }
 
 			//! The constructor.
 			//!
 			//! @param processes_data List of JudgeProcessData elements
 			//! @param log_handler Log handler function object
+			template <typename FunctorT>
 			JudgeProcess(
 				std::initializer_list<JudgeProcessData> processes_data,
-				std::function<ErrorHandler>&& log_handler
-			);
+				FunctorT&& log_handler
+			) : log_handler_(std::forward<FunctorT>(log_handler))
+			{
+				processes_.reserve(processes_data.size());
+				std::size_t num = 1;
+				for (const auto& d : processes_data)
+					processes_.emplace_back(std::make_unique<detail::JudgeProcessUnit>(*this, num++, d));
+			}
 
 			//! The constructor.
 			//!
@@ -181,9 +189,9 @@ namespace dscv
 			//! @param begin begin iterator to the range of JudgeProcessData elements
 			//! @param end end iterator to the range of JudgeProcessData elements
 			//! @param log_handler log handler function object
-			template<typename IterT>
-			JudgeProcess(IterT begin, IterT end, std::function<ErrorHandler>&& log_handler)
-				: log_handler_(std::move(log_handler))
+			template<typename IterT, typename FunctorT>
+			JudgeProcess(IterT begin, IterT end, FunctorT&& log_handler)
+				: log_handler_(std::forward<FunctorT>(log_handler))
 			{
 				// For std::move_iterator, don't add const and pass it through std::move()
 				std::for_each(begin, end, [](IterT::reference process_data) {

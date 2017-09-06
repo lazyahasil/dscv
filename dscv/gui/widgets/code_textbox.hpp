@@ -69,17 +69,31 @@ namespace dscv
 			//! Sets the function which is called when vertically scrolled to the end.
 			//!
 			//! @param functor std::function object
-			void min_or_max_vert_scrolled_func(std::function<void(bool)>&& functor) noexcept;
+			template <typename FunctorT>
+			void min_or_max_vert_scrolled_func(FunctorT&& functor) noexcept
+			{
+				min_or_max_vert_scrolled_func_ = std::forward<FunctorT>(functor);
+			}
 
 			//! Sets the function which decides background colors of line numbers.
 			//!
 			//! @param functor std::function object
-			void line_num_bgcolor_func(std::function<nana::color(std::size_t)>&& functor) noexcept;
+			template <typename FunctorT>
+			void line_num_bgcolor_func(FunctorT&& functor) noexcept
+			{
+				line_num_bgcolor_func_ = std::forward<FunctorT>(functor);
+				line_num_panel_bgcolor_ = line_num_bgcolor_func_(0);
+				line_num_.bgcolor(line_num_panel_bgcolor_);
+			}
 
 			//! Sets the function which decides foreground colors of line numbers.
 			//!
 			//! @param functor std::function object
-			void line_num_fgcolor_func(std::function<nana::color(std::size_t)>&& functor) noexcept;
+			template <typename FunctorT>
+			void line_num_fgcolor_func(FunctorT&& functor) noexcept
+			{
+				line_num_fgcolor_func_ = std::forward<FunctorT>(functor);
+			}
 
 			//! Returns a reference to the textbox
 			nana::textbox& tb() noexcept

@@ -216,11 +216,13 @@ namespace dscv
 
 				internationalization i18n;
 
-				lb_streams_.append_header(i18n("Type"));
-				lb_streams_.append_header(i18n("Num"));
-				lb_streams_.append_header(i18n("Stream Info"));
-
-				lb_streams_.sortable(false);
+				// Initiate lb_streams_
+				{
+					lb_streams_.append_header(i18n("Type"));
+					lb_streams_.append_header(i18n("Num"));
+					lb_streams_.append_header(i18n("Stream Info"));
+					lb_streams_.sortable(false);
+				}
 
 				grp_streams_.collocate();
 			}

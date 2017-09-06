@@ -64,6 +64,8 @@ namespace dscv
 
 				//! Makes the group "comp".
 				void _make_grp_comp();
+
+				//! Makes the group "streams"
 				void _make_grp_streams();
 
 				ConfigHandler::Ptree& options_ptree_;

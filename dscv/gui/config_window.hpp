@@ -2,8 +2,6 @@
 
 #include "widgets/wrapper_panel.hpp"
 
-#include <nana/gui.hpp>
-
 #include <mutex>
 
 namespace dscv
