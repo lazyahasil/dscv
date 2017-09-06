@@ -16,7 +16,14 @@ namespace dscv
 		MainWindow::MainWindow(nana::window wd)	: MainWindowBase(wd)
 		{
 			// Set the form window's title
-			caption(std::string{ "DSCV v" } + k_version_str);
+			caption(
+				dynamic_cast<std::ostringstream&>(
+					std::ostringstream{} << "DSCV v" << k_version_str
+#ifdef _DEBUG
+					<< " (Debug Mode)"
+#endif
+					).str().c_str()
+			);
 
 			// Set minimum window size
 			API::track_window_size(*this, { 480, 100 }, false);
@@ -26,11 +33,6 @@ namespace dscv
 				"<weight=26 menubar_panel>"
 				"<scroll_page>"
 			);
-
-			/*judge_page_.bgcolor(colors::white);
-			judge_page_.content().scroll_panel(judge_page_);
-			judge_page_.forced_vert_bar(true);
-			judge_page_.side_adaptable(true);*/
 
 			_add_judge_page("Judge Page 1");
 			plc_["scroll_page"] << **scroll_pages_.begin();

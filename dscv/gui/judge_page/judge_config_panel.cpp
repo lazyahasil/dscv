@@ -44,7 +44,7 @@ namespace dscv
 				plc_.collocate();
 
 				// Load configuration from the ptree
-				_load_config();
+				_load_config_options();
 			}
 
 			JudgeConfigPanel::~JudgeConfigPanel()
@@ -106,7 +106,7 @@ namespace dscv
 				});
 			}
 
-			void JudgeConfigPanel::_load_config()
+			void JudgeConfigPanel::_load_config_options()
 			{
 				// Group "judging"
 				{
@@ -214,15 +214,25 @@ namespace dscv
 				btn_modify_stream_.i18n(i18n_eval{ "Modify" });
 				btn_remove_stream_.i18n(i18n_eval{ "Remove" });
 
-				internationalization i18n;
-
 				// Initiate lb_streams_
-				{
-					lb_streams_.append_header(i18n("Type"));
-					lb_streams_.append_header(i18n("Num"));
-					lb_streams_.append_header(i18n("Stream Info"));
+				lb_streams_.avoid_drawing([this] {
+					internationalization i18n;
+
 					lb_streams_.sortable(false);
-				}
+
+					check_judging_force_endl_at_input_end_.check(
+						options_ptree_.get(options::k_judging_force_endl_at_input_end, false)
+					);
+
+					lb_streams_.append_header(i18n("Num"), 45);
+					lb_streams_.append_header(i18n("Media"), 60);
+					lb_streams_.append_header(i18n("Filename"), 210);
+
+					lb_streams_.append(i18n("Console Streams"));
+					lb_streams_.append(i18n("Input Files"));
+					lb_streams_.append(i18n("Output Files"));
+					lb_streams_.append(i18n("I/O Hybrid Files"));
+				});
 
 				grp_streams_.collocate();
 			}

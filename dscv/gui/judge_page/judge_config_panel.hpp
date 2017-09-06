@@ -27,6 +27,18 @@ namespace dscv
 					= "comp_dont_ignore_consecutive_spaces";
 			}
 
+			namespace config_panel
+			{
+				constexpr const char* k_path_str = "config_panel";
+				constexpr const char* k_window_width = "window_width";
+				constexpr const char* k_window_height = "window_height";
+
+				constexpr const char* k_streams_list_num_width = "streams_list_num_width";
+				constexpr const char* k_streams_list_media_width = "streams_list_media_width";
+				constexpr const char* k_streams_list_filename_width = "streams_list_filename_width";
+
+			}
+
 			//! The settings window for JudgePage
 			class JudgeConfigPanel : public nana::panel<false>
 			{
@@ -57,7 +69,7 @@ namespace dscv
 				);
 
 				//! Loads configurations from the ptree into widgets.
-				void _load_config();
+				void _load_config_options();
 
 				//! Makes the group "judging".
 				void _make_grp_judging();
@@ -67,6 +79,14 @@ namespace dscv
 
 				//! Makes the group "streams"
 				void _make_grp_streams();
+
+				enum class StreamCategory : std::size_t
+				{
+					console,
+					in_files,
+					out_files,
+					inout_files,
+				};
 
 				ConfigHandler::Ptree& options_ptree_;
 
