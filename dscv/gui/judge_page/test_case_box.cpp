@@ -312,9 +312,9 @@ namespace dscv
 					) {
 					for (const auto& val : files_ptree)
 					{
-						auto type = val.second.get_optional<std::string>(judge_stream_info::file_info::k_type);
+						auto media = val.second.get_optional<std::string>(judge_stream_info::file_info::k_media);
 						auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
-						if (!type || *type == judge_stream_info::file_types::k_text) // Text stream
+						if (!media || *media == judge_stream_info::file_media::k_text) // Text stream
 							(this->*text_adder)(filename);
 					}
 				};

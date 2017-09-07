@@ -78,6 +78,7 @@ namespace dscv
 				}
 
 				void case_num(std::size_t num);
+
 				void clear_results_and_log();
 
 				void collocate()
@@ -125,7 +126,9 @@ namespace dscv
 				}
 
 				std::string text_stream_stdin() const noexcept;
+
 				std::string text_stream_stdout_case() const noexcept;
+
 				void text_stream_stdout_result_append(const std::string& str);
 
 			private:

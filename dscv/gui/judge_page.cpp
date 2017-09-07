@@ -344,9 +344,9 @@ namespace dscv
 					std::size_t count = 0;
 					for (const auto& val : files_ptree)
 					{
-						auto type = val.second.get_optional<std::string>(judge_stream_info::file_info::k_type);
+						auto media = val.second.get_optional<std::string>(judge_stream_info::file_info::k_media);
 						auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
-						if (!type || *type == judge_stream_info::file_types::k_text) // Text stream
+						if (!media || *media == judge_stream_info::file_media::k_text) // Text stream
 						{
 							_write_text_file_for_judge(
 								dir_wstr + std::wstring(charset{ filename }),

@@ -20,10 +20,10 @@ namespace dscv
 			namespace file_info
 			{
 				constexpr const char* k_name = "filename";
-				constexpr const char* k_type = "type";
+				constexpr const char* k_media = "media";
 			}
 
-			namespace file_types
+			namespace file_media
 			{
 				constexpr const char* k_text = "text";
 			}

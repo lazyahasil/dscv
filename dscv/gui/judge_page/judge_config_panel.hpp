@@ -33,15 +33,17 @@ namespace dscv
 				constexpr const char* k_window_width = "window_width";
 				constexpr const char* k_window_height = "window_height";
 
-				constexpr const char* k_streams_list_num_width = "streams_list_num_width";
-				constexpr const char* k_streams_list_media_width = "streams_list_media_width";
-				constexpr const char* k_streams_list_filename_width = "streams_list_filename_width";
-
+				constexpr const char* k_list_streams_num_width = "list_streams_num_width";
+				constexpr const char* k_list_streams_list_media_width = "list_streams_media_width";
+				constexpr const char* k_list_streams_list_filename_width = "list_streams_filename_width";
 			}
 
 			//! The settings window for JudgePage
 			class JudgeConfigPanel : public nana::panel<false>
 			{
+			private:
+				struct ListStreamsElement;
+
 			public:
 				JudgeConfigPanel() = delete;
 				JudgeConfigPanel(nana::window wd, JudgePage& page);
@@ -80,20 +82,47 @@ namespace dscv
 				//! Makes the group "streams"
 				void _make_grp_streams();
 
-				enum class StreamCategory : std::size_t
+				enum class ListStreamsCategory : std::size_t
 				{
+					unclassified,
 					console,
 					in_files,
 					out_files,
 					inout_files,
 				};
 
+				enum class ListStreamsHeader : std::size_t
+				{
+					num,
+					filename,
+					media
+				};
+
 				ConfigHandler::Ptree& options_ptree_;
+				ConfigHandler::Ptree& streams_ptree_;
 
 				nana::place plc_{ *this };
 
 				nana::group grp_streams_{ *this, "", true };
+				
+				struct ListStreamsElement
+				{
+					ListStreamsElement() = default;
+					ListStreamsElement(std::size_t _num, const std::string& _filename, const std::string& _media)
+						: num(_num), filename(_filename), media(_media)
+					{ }
+
+					std::size_t num{ 0 };
+					std::string filename;
+					std::string media;
+				};
+
+				//! Listbox for the streams
+				//!
+				//! Using STL containers shows much better performance.
+				//! http://nanapro.org/en-us/blog/2016/07/3-methods-to-insert-data-into-listbox/
 				nana::listbox lb_streams_{ grp_streams_ };
+
 				nana::button btn_add_stream_{ grp_streams_ };
 				nana::button btn_modify_stream_{ grp_streams_ };
 				nana::button btn_remove_stream_{ grp_streams_ };
