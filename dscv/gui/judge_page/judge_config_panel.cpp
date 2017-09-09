@@ -300,6 +300,12 @@ namespace dscv
 
 				grp_streams_.collocate();
 			}
+
+			JudgeConfigPanel::StreamAdderPanel::StreamAdderPanel(JudgeConfigPanel& config_panel)
+				: nana::panel<false>(nana::window(config_panel)), config_panel_ref_(config_panel)
+			{
+
+			}
 		}
 	}
 }

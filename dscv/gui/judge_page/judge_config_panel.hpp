@@ -3,10 +3,12 @@
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/checkbox.hpp>
+#include <nana/gui/widgets/combox.hpp>
 #include <nana/gui/widgets/group.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
 #include <nana/gui/widgets/panel.hpp>
+#include <nana/gui/widgets/textbox.hpp>
 
 #include "../../config_handler.hpp"
 
@@ -42,6 +44,9 @@ namespace dscv
 			class JudgeConfigPanel : public nana::panel<false>
 			{
 			private:
+				class StreamAdderPanel;
+				class StreamModifierPanel;
+
 				struct ListStreamsElement;
 
 			public:
@@ -147,6 +152,32 @@ namespace dscv
 				nana::checkbox check_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
 				//! Option whether to not ignore consecutive spaces while comparsion
 				nana::label label_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
+			};
+
+			class JudgeConfigPanel::StreamAdderPanel : public nana::panel<false>
+			{
+			public:
+				StreamAdderPanel() = delete;
+				StreamAdderPanel(JudgeConfigPanel& config_panel);
+
+			private:
+				JudgeConfigPanel& config_panel_ref_;
+
+				nana::place plc_{ *this };
+
+				nana::label label_title_{ *this };
+				nana::combox combo_type_{ *this };
+				nana::label label_filename_{ *this };
+				nana::textbox tb_filename_{ *this };
+				nana::combox combo_media_{ *this };
+				nana::button btn_add_{ *this };
+			};
+
+			class JudgeConfigPanel::StreamModifierPanel : public nana::panel<false>
+			{
+			public:
+
+			private:
 			};
 		}
 	}
