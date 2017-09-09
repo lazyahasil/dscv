@@ -104,12 +104,16 @@ namespace dscv
 				nana::place plc_{ *this };
 
 				nana::group grp_streams_{ *this, "", true };
-				
+
 				struct ListStreamsElement
 				{
 					ListStreamsElement() = default;
-					ListStreamsElement(std::size_t _num, const std::string& _filename, const std::string& _media)
-						: num(_num), filename(_filename), media(_media)
+
+					template <typename StringT1, typename StringT2>
+					ListStreamsElement(std::size_t _num, StringT1&& _filename, StringT2&& _media)
+						: num(_num),
+						  filename(std::forward<StringT1>(_filename)),
+						  media(std::forward<StringT2>(_media))
 					{ }
 
 					std::size_t num{ 0 };
@@ -135,7 +139,7 @@ namespace dscv
 				nana::checkbox check_judging_force_endl_at_input_end_{ grp_judging_ };
 				//! Option whether to insert endl to output's end if not existing
 				nana::label label_judging_force_endl_at_input_end_{ grp_judging_ };
-				
+
 				nana::group grp_comp_{ *this, "", true };
 				nana::label label_comp_sorry_for_incompletion_{ grp_comp_, "Sorry, comparison is WIP." };
 

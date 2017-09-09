@@ -91,7 +91,7 @@ namespace dscv
 				checkbox.bgcolor(grp.bgcolor());
 				API::effects_edge_nimbus(checkbox, effects::edge_nimbus::active);
 				API::tabstop(checkbox);
-				
+
 				// Bind the checkbox with options_ptree_
 				checkbox.events().checked([this, option_str](const arg_checkbox& arg) {
 					options_ptree_.put(option_str, arg.widget->checked());
@@ -213,10 +213,11 @@ namespace dscv
 
 				internationalization i18n;
 
-				lb_streams_.sortable(false);
+				lb_streams_.sortable(false); // Prevent sorting
+				lb_streams_.enable_single(true, false); // Prevent selecting multiples
 
 				lb_streams_.append_header(i18n("Num"), 45);
-				lb_streams_.append_header(i18n("Filename"), 210);
+				lb_streams_.append_header(i18n("File Name"), 210);
 				lb_streams_.append_header(i18n("Media"), 60);
 
 				lb_streams_.append(i18n("Console Streams"));
@@ -249,7 +250,7 @@ namespace dscv
 				{
 					std::vector<ListStreamsElement> console;
 					internationalization i18n;
-					
+
 					auto has_stdin = streams_ptree_.get(judge_stream_info::k_has_stdin, false);
 					auto has_stdout = streams_ptree_.get(judge_stream_info::k_has_stdout, false);
 

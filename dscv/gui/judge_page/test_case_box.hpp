@@ -137,7 +137,7 @@ namespace dscv
 				);
 
 				void _init_streams_from_info();
-				
+
 				JudgePage& page_ref_;
 				std::size_t case_num_;
 

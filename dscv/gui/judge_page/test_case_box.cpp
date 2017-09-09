@@ -299,7 +299,7 @@ namespace dscv
 				auto& ptree_in_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_in_files);
 				auto& ptree_out_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_out_files);
 				auto& ptree_inout_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_inout_files);
-				
+
 				if (has_stdin)
 					add_text_stream_stdin();
 
