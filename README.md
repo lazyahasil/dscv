@@ -11,8 +11,8 @@ I'm sorry that it's WIP. Soon there will be added licenses from libraries.
 
 Written in C++14 with MSVC 2015 Community Update 3.
 
-* [Nana C++ Library](http://nanapro.org/en-us/) 1.5.5
-* [Boost C++ Libraries](http://www.boost.org/) 1.65.1
+* [Nana C++ Library](http://nanapro.org/en-us/) 1.5.4
+* [Boost C++ Libraries](http://www.boost.org/) 1.64.0
 
 ## Downloads
 
@@ -21,5 +21,3 @@ https://github.com/lazyahasil/dscv/releases
 ## Documentation
 
 https://lazyahasil.github.io/dscv-doxygen/
-
-[Document Source](https://github.com/lazyahasil/dscv-doxygen)
