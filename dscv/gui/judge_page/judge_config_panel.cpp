@@ -265,8 +265,12 @@ namespace dscv
 
 				// File elements
 				{
-					auto file_elements_generator
-						= [](const ConfigHandler::Ptree& files_ptree) -> std::vector<ListStreamsElement> {
+					auto file_elements_generator = [
+						this,
+						val_translator{ std::move(val_translator) },
+						cell_translator{ std::move(cell_translator) }
+					](std::size_t lb_cat_pos, const std::string& files_key) {
+						auto& files_ptree = ConfigHandler::subtree(streams_ptree_, files_key);
 						std::vector<ListStreamsElement> elements;
 						std::size_t count = 1;
 
@@ -279,23 +283,22 @@ namespace dscv
 							elements.emplace_back(count++, std::move(filename), std::move(*media));
 						}
 
-						return elements;
+						lb_streams_.at(lb_cat_pos).model<std::recursive_mutex>(
+							std::move(elements), val_translator, cell_translator);
 					};
 
-					std::vector<ListStreamsElement> in_files = file_elements_generator(
-						ConfigHandler::subtree(streams_ptree_, judge_stream_info::k_array_in_files));
-					lb_streams_.at(static_cast<std::size_t>(ListStreamsCategory::in_files))
-						.model<std::recursive_mutex>(std::move(in_files), val_translator, cell_translator);
-
-					std::vector<ListStreamsElement> out_files = file_elements_generator(
-						ConfigHandler::subtree(streams_ptree_, judge_stream_info::k_array_out_files));
-					lb_streams_.at(static_cast<std::size_t>(ListStreamsCategory::out_files))
-						.model<std::recursive_mutex>(std::move(out_files), val_translator, cell_translator);
-
-					std::vector<ListStreamsElement> inout_files = file_elements_generator(
-						ConfigHandler::subtree(streams_ptree_, judge_stream_info::k_array_inout_files));
-					lb_streams_.at(static_cast<std::size_t>(ListStreamsCategory::inout_files))
-						.model<std::recursive_mutex>(std::move(inout_files), val_translator, cell_translator);
+					file_elements_generator(
+						static_cast<std::size_t>(ListStreamsCategory::in_files),
+						judge_stream_info::k_array_in_files
+					);
+					file_elements_generator(
+						static_cast<std::size_t>(ListStreamsCategory::out_files),
+						judge_stream_info::k_array_out_files
+					);
+					file_elements_generator(
+						static_cast<std::size_t>(ListStreamsCategory::inout_files),
+						judge_stream_info::k_array_inout_files
+					);
 				}
 
 				grp_streams_.collocate();
