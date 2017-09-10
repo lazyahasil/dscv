@@ -44,6 +44,7 @@ namespace dscv
 			class JudgeConfigPanel : public nana::panel<false>
 			{
 			private:
+				class StreamExtraPanelBase;
 				class StreamAdderPanel;
 				class StreamModifierPanel;
 
@@ -87,6 +88,9 @@ namespace dscv
 				//! Makes the group "streams"
 				void _make_grp_streams();
 
+				//! Makes the group "streams"
+				void _make_grp_streams_lb();
+
 				enum class ListStreamsCategory : std::size_t
 				{
 					unclassified,
@@ -108,8 +112,6 @@ namespace dscv
 
 				nana::place plc_{ *this };
 
-				nana::group grp_streams_{ *this, "", true };
-
 				struct ListStreamsElement
 				{
 					ListStreamsElement() = default;
@@ -126,17 +128,22 @@ namespace dscv
 					std::string media;
 				};
 
+				nana::group grp_streams_{ *this, "", true };
+
 				//! Listbox for the streams
 				//!
 				//! Using STL containers shows much better performance.
 				//! http://nanapro.org/en-us/blog/2016/07/3-methods-to-insert-data-into-listbox/
 				nana::listbox lb_streams_{ grp_streams_ };
 
-				nana::button btn_add_stream_{ grp_streams_ };
-				nana::button btn_modify_stream_{ grp_streams_ };
-				nana::button btn_remove_stream_{ grp_streams_ };
-				nana::button btn_move_up_stream_{ grp_streams_, u8"\u2b06" };
-				nana::button btn_move_down_stream_{ grp_streams_, u8"\u2b07" };
+				nana::button btn_streams_add_{ grp_streams_ };
+				nana::button btn_streams_modify_{ grp_streams_ };
+				nana::button btn_streams_remove_{ grp_streams_ };
+				nana::button btn_streams_move_up_{ grp_streams_, u8"\u2b06" };
+				nana::button btn_streams_move_down_{ grp_streams_, u8"\u2b07" };
+
+				nana::group grp_streams_extra_{ grp_streams_, "", true };
+				std::unique_ptr<StreamExtraPanelBase> panel_streams_extra_ptr_;
 
 				nana::group grp_judging_{ *this, "", true };
 
@@ -154,30 +161,48 @@ namespace dscv
 				nana::label label_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
 			};
 
-			class JudgeConfigPanel::StreamAdderPanel : public nana::panel<false>
+			class JudgeConfigPanel::StreamExtraPanelBase : public nana::panel<false>
 			{
 			public:
-				StreamAdderPanel() = delete;
-				StreamAdderPanel(JudgeConfigPanel& config_panel);
+				StreamExtraPanelBase() = delete;
+				StreamExtraPanelBase(nana::window wd, JudgeConfigPanel& config_panel);
 
-			private:
+				virtual ~StreamExtraPanelBase() = default;
+
+			protected:
 				JudgeConfigPanel& config_panel_ref_;
 
 				nana::place plc_{ *this };
 
-				nana::label label_title_{ *this };
+				nana::label label_type_{ *this };
 				nana::combox combo_type_{ *this };
+				nana::label label_media_{ *this };
+				nana::combox combo_media_{ *this };
 				nana::label label_filename_{ *this };
 				nana::textbox tb_filename_{ *this };
-				nana::combox combo_media_{ *this };
+
+			private:
+				nana::button btn_cancel_{ *this };
+			};
+
+			class JudgeConfigPanel::StreamAdderPanel : public JudgeConfigPanel::StreamExtraPanelBase
+			{
+			public:
+				StreamAdderPanel() = delete;
+				StreamAdderPanel(nana::window wd, JudgeConfigPanel& config_panel);
+
+			private:
 				nana::button btn_add_{ *this };
 			};
 
-			class JudgeConfigPanel::StreamModifierPanel : public nana::panel<false>
+			class JudgeConfigPanel::StreamModifierPanel : public JudgeConfigPanel::StreamExtraPanelBase
 			{
 			public:
+				StreamModifierPanel() = delete;
+				StreamModifierPanel(nana::window wd, JudgeConfigPanel& config_panel);
 
 			private:
+				nana::button btn_modify_{ *this };
 			};
 		}
 	}
