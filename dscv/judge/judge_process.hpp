@@ -84,9 +84,36 @@ namespace dscv
 				}
 
 			private:
+				//! Handles asynchronously received data and makes it await.
+				//!
+				//! It's called by the functor argument for boost::asio::async_read() at _post_receive().\n
+				//! Then it calls _post_receive() so that incoming data can be received repeatedly.\n
+				//! If there's any error, the functor group_ref_.handle_error will be called and this child process
+				//! will be terminated by compulsion.
+				//! @param ec Boost-style error code
+				//! @param bytes_transferred bytes of data transferred
+				//! @sa _post_receive()
 				void _handle_receive(const boost::system::error_code& ec, size_t bytes_transferred);
+
+				//! Handles asynchronously sending error and closes the pipe.
+				//!
+				//! It's called by the functor argument for boost::asio::async_write() at _post_send().\n
+				//! Then it closes the boost::process::async_pipe so that EOF may be sended.\n
+				//! If there's any error, the functor group_ref_.handle_error will be called and this child process
+				//! will be terminated by compulsion.
+				//! @param ec Boost-style error code
+				//! @param bytes_transferred bytes of data transferred
+				//! @sa _post_send()
 				void _handle_send(const boost::system::error_code& ec, size_t bytes_transferred);
+
+				//! Asynchronously waits for incoming data and receives it.
+				//!
+				//! @sa _handle_receive()
 				void _post_receive();
+
+				//! Asynchronously sends data.
+				//!
+				//! @sa _handle_send()
 				void _post_send();
 
 			public:
