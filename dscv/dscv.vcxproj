@@ -179,6 +179,7 @@
   <ItemGroup>
     <ClInclude Include="config_handler.hpp" />
     <ClInclude Include="gui\config_gui_helper.hpp" />
+    <ClInclude Include="gui\config_panel_base.hpp" />
     <ClInclude Include="gui\config_window.hpp" />
     <ClInclude Include="gui\i18n_helper\i18n_data.hpp" />
     <ClInclude Include="gui\main_window\main_window_base.hpp" />

@@ -30,6 +30,13 @@ namespace dscv
 			});
 		}
 
+		void ConfigWindow::apply_i18n()
+		{
+			if (!content_ptr_)
+				return;
+			content_ptr_->apply_i18n();
+		}
+
 		void ConfigWindow::prevent_invalid_ref(PageBase& page)
 		{
 			if (page_ptr_ == &page)

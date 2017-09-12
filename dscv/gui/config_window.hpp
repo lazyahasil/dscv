@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "widgets/wrapper_panel.hpp"
+#include "config_panel_base.hpp"
 
 #include <mutex>
 
@@ -20,12 +21,14 @@ namespace dscv
 
 			ConfigWindow() : ConfigWindow(nullptr) { }
 
+			void apply_i18n();
+
 			//! Creates the content from arguments.
 			//!
 			//! @param page reference to the JudgePage
 			//! @param args the arguments forwarded to the content's constructor without the parent's handle
-			//! @throws std::runtime_error if std::make_unique<ContentT>() fails
-			template <typename ContentT, typename ...Args>
+			//! @throws std::runtime_error if std::make_unique<ConfigPanelT>() fails
+			template <typename ConfigPanelT, typename ...Args>
 			void content(PageBase& page, Args&&... args);
 
 			//! Returns its content as nana::widget type.
@@ -54,16 +57,16 @@ namespace dscv
 		private:
 			nana::place plc_{ *this };
 
-			std::unique_ptr<nana::widget> content_ptr_;
+			std::unique_ptr<ConfigPanelBase> content_ptr_;
 			PageBase* page_ptr_{ nullptr };
 			std::recursive_mutex mutex_;
 		};
 
-		template <typename ContentT, typename ...Args>
+		template <typename ConfigPanelT, typename ...Args>
 		void ConfigWindow::content(PageBase& page, Args&&... args)
 		{
-			static_assert(std::is_base_of<nana::widget, ContentT>::value,
-				"ConfigWindow::content() requires ContentT which inherits nana::widget.");
+			static_assert(std::is_base_of<ConfigPanelBase, ConfigPanelT>::value,
+				"ConfigWindow::content() requires ContentT which inherits ConfigPanelBase.");
 
 			std::lock_guard<std::recursive_mutex> lock{ mutex_ };
 
@@ -71,7 +74,7 @@ namespace dscv
 			if (page_ptr_ == &page)
 				return;
 
-			content_ptr_ = std::make_unique<ContentT>(*this, std::forward<Args>(args)...);
+			content_ptr_ = std::make_unique<ConfigPanelT>(*this, std::forward<Args>(args)...);
 			page_ptr_ = &page;
 			if (!content_ptr_)
 				throw std::runtime_error{ "ConfigWindow failed to create the content's instance!" };

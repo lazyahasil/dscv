@@ -1,5 +1,6 @@
 ﻿#include "main_window.hpp"
 
+#include "widgets/code_textbox.hpp"
 #include "../version.hpp"
 #include "about_window.hpp"
 #include "config_gui_helper.hpp"
@@ -112,6 +113,12 @@ namespace dscv
 		void MainWindow::_set_language_and_refresh_menubar(const std::string& lang_str)
 		{
 			i18n_helper::load_language(lang_str);
+			
+			{
+				CodeTextbox::apply_i18n();
+				config_wd_.apply_i18n();
+			}
+
 			_make_menubar();
 			plc_.collocate();
 			config_gui_helper::write_json_noexcept();

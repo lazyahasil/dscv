@@ -17,7 +17,7 @@ namespace dscv
 		namespace judge_page
 		{
 			JudgeConfigPanel::JudgeConfigPanel(nana::window wd, JudgePage& page)
-				: panel<false>(wd), options_ptree_(page.options_ptree()), streams_ptree_(page.streams_ptree())
+				: ConfigPanelBase(wd), options_ptree_(page.options_ptree()), streams_ptree_(page.streams_ptree())
 			{
 				plc_.div(
 					"margin=5"
@@ -34,7 +34,7 @@ namespace dscv
 				plc_["grp_comp"] << grp_comp_;
 
 				// Make groups
-				apply_grp_i18n();
+				apply_i18n();
 				_make_grp_streams();
 				_make_grp_judging();
 				_make_grp_comp();
@@ -51,11 +51,11 @@ namespace dscv
 				config_gui_helper::write_json_noexcept();
 			}
 
-			void JudgeConfigPanel::apply_grp_i18n()
+			void JudgeConfigPanel::apply_i18n()
 			{
-				// In Nana 1.5.4, a string is needed for nana::group's constructor.
+				// In Nana 1.5.5, a string is needed for nana::group's constructor.
 				// Otherwise, nana::group will never be captioned with any other means.
-				// And i18n_eval and typeface() doesn't work for nana::group.
+				// And i18n_eval and typeface() doesn't work at the same time for nana::group.
 
 				internationalization i18n;
 
@@ -79,6 +79,9 @@ namespace dscv
 						"<size=11>" << i18n("Result Comparison") << "</>"
 						).str().c_str()
 				);
+
+				if (grp_streams_extra_ptr_)
+					grp_streams_extra_ptr_->apply_i18n();
 			}
 
 			void JudgeConfigPanel::_init_checkbox_and_label(
@@ -192,8 +195,8 @@ namespace dscv
 
 			void JudgeConfigPanel::_make_grp_streams()
 			{
-				grp_streams_.div(
-					"vert margin=[10,10,7,10]"
+				plc_streams_.div(
+					"vert margin=[25,10,10,10]"
 					"<lb_streams>"
 					"<weight=30 margin=[5,0,0,0]"
 					"  <margin=[0,5,0,0] btn_add_stream>"
@@ -205,13 +208,13 @@ namespace dscv
 					">"
 					"<weight=120 margin=[7,0,0,0] grp_streams_extra>"
 				);
-				grp_streams_["lb_streams"] << lb_streams_;
-				grp_streams_["btn_add_stream"] << btn_streams_add_;
-				grp_streams_["btn_modify_stream"] << btn_streams_modify_;
-				grp_streams_["btn_remove_stream"] << btn_streams_remove_;
-				grp_streams_["btn_move_up_stream"] << btn_streams_move_up_;
-				grp_streams_["btn_move_down_stream"] << btn_streams_move_down_;
-				grp_streams_["grp_streams_extra"] << grp_streams_extra_;
+				plc_streams_["lb_streams"] << lb_streams_;
+				plc_streams_["btn_add_stream"] << btn_streams_add_;
+				plc_streams_["btn_modify_stream"] << btn_streams_modify_;
+				plc_streams_["btn_remove_stream"] << btn_streams_remove_;
+				plc_streams_["btn_move_up_stream"] << btn_streams_move_up_;
+				plc_streams_["btn_move_down_stream"] << btn_streams_move_down_;
+				plc_streams_.field_display("grp_streams_extra", false);
 
 				// Set i18n
 				btn_streams_add_.i18n(i18n_eval{ "Add" });
@@ -224,27 +227,21 @@ namespace dscv
 				// Make the listbox
 				_make_grp_streams_lb();
 
-				// Set grp_streams_extra_
-				grp_streams_extra_.div(
-					"margin=[10,10,5,10]"
-					"<panel_streams_extra_ptr>"
-				);
-
 				btn_streams_add_.events().click([this] {
-					grp_streams_extra_.i18n(i18n_eval{ "Stream Addition" });
-					panel_streams_extra_ptr_ = std::make_unique<StreamAdderPanel>(grp_streams_extra_, *this);
-					grp_streams_extra_["panel_streams_extra_ptr"] << *panel_streams_extra_ptr_;
-					grp_streams_extra_.collocate();
+					grp_streams_extra_ptr_ = std::make_unique<StreamAdderGroup>(grp_streams_, *this);
+					plc_streams_["grp_streams_extra"] << *grp_streams_extra_ptr_;
+					plc_streams_.field_display("grp_streams_extra", true);
+					plc_streams_.collocate();
 				});
 
 				btn_streams_modify_.events().click([this] {
-					grp_streams_extra_.i18n(i18n_eval{ "Stream Modification" });
-					panel_streams_extra_ptr_ = std::make_unique<StreamModifierPanel>(grp_streams_extra_, *this);
-					grp_streams_extra_["panel_streams_extra_ptr"] << *panel_streams_extra_ptr_;
-					grp_streams_extra_.collocate();
+					grp_streams_extra_ptr_ = std::make_unique<StreamModifierGroup>(grp_streams_, *this);
+					plc_streams_["grp_streams_extra"] << *grp_streams_extra_ptr_;
+					plc_streams_.field_display("grp_streams_extra", true);
+					plc_streams_.collocate();
 				});
 
-				grp_streams_.collocate();
+				plc_streams_.collocate();
 			}
 
 			void JudgeConfigPanel::_make_grp_streams_lb()
@@ -350,12 +347,12 @@ namespace dscv
 				});
 			}
 
-			JudgeConfigPanel::StreamExtraPanelBase::StreamExtraPanelBase(
+			JudgeConfigPanel::StreamExtraGroupBase::StreamExtraGroupBase(
 				nana::window wd, JudgeConfigPanel& config_panel
-			) : nana::panel<false>(wd), config_panel_ref_(config_panel)
+			) : nana::group(wd, "", true), config_panel_ref_(config_panel)
 			{
 				plc_.div(
-					"vert"
+					"vert margin=[25,10,10,10]"
 					"<weight=20"
 					"  <weight=55%"
 					"    <weight=70 label_type>"
@@ -363,7 +360,7 @@ namespace dscv
 					"  >"
 					"  <weight=5%>"
 					"  <"
-					"    <weight=46 label_media>"
+					"    <weight=49 label_media>"
 					"    <margin=[0,0,0,3] combo_media>"
 					"  >"
 					">"
@@ -403,27 +400,51 @@ namespace dscv
 				tb_filename_.multi_lines(false);
 			}
 
-			JudgeConfigPanel::StreamAdderPanel::StreamAdderPanel(nana::window wd, JudgeConfigPanel& config_panel)
-				: StreamExtraPanelBase(wd, config_panel)
+			void JudgeConfigPanel::StreamExtraGroupBase::_apply_i18n_styled(const std::string& str_translated)
+			{
+				caption(
+					dynamic_cast<std::ostringstream&>(
+						std::ostringstream{} << ""
+						"<size=11>" << str_translated << "</>"
+						).str().c_str()
+				);
+			}
+
+			JudgeConfigPanel::StreamAdderGroup::StreamAdderGroup(nana::window wd, JudgeConfigPanel& config_panel)
+				: StreamExtraGroupBase(wd, config_panel)
 			{
 				plc_["btn_action"] << btn_add_;
 
 				// Set i18n
+				apply_i18n();
 				btn_add_.i18n(i18n_eval{ "Add" });
 
 				plc_.collocate();
 			}
 
-			JudgeConfigPanel::StreamModifierPanel::StreamModifierPanel(nana::window wd, JudgeConfigPanel& config_panel)
-				: StreamExtraPanelBase(wd, config_panel)
+			void JudgeConfigPanel::StreamAdderGroup::apply_i18n()
+			{
+				internationalization i18n;
+				_apply_i18n_styled(i18n("Stream Addition"));
+			}
+
+			JudgeConfigPanel::StreamModifierGroup::StreamModifierGroup(nana::window wd, JudgeConfigPanel& config_panel)
+				: StreamExtraGroupBase(wd, config_panel)
 			{
 				plc_["btn_action"] << btn_modify_;
 
 				// Set i18n
+				apply_i18n();
 				btn_modify_.i18n(i18n_eval{ "Modify" });
 
 				plc_.collocate();
 			}
-}
+
+			void JudgeConfigPanel::StreamModifierGroup::apply_i18n()
+			{
+				internationalization i18n;
+				_apply_i18n_styled(i18n("Stream Modification"));
+			}
+		}
 	}
 }

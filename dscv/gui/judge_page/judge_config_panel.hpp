@@ -1,16 +1,15 @@
 ﻿#pragma once
 
-#include <nana/gui.hpp>
+#include "../config_panel_base.hpp"
+#include "../../config_handler.hpp"
+
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/checkbox.hpp>
 #include <nana/gui/widgets/combox.hpp>
 #include <nana/gui/widgets/group.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
-#include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/widgets/textbox.hpp>
-
-#include "../../config_handler.hpp"
 
 namespace dscv
 {
@@ -41,12 +40,12 @@ namespace dscv
 			}
 
 			//! The settings window for JudgePage
-			class JudgeConfigPanel : public nana::panel<false>
+			class JudgeConfigPanel : public ConfigPanelBase
 			{
 			private:
-				class StreamExtraPanelBase;
-				class StreamAdderPanel;
-				class StreamModifierPanel;
+				class StreamExtraGroupBase;
+				class StreamAdderGroup;
+				class StreamModifierGroup;
 
 				struct ListStreamsElement;
 
@@ -57,7 +56,7 @@ namespace dscv
 				~JudgeConfigPanel();
 
 				//! Applies i18n to all the group.
-				void apply_grp_i18n();
+				void apply_i18n() override;
 
 			private:
 				//! Initiates a option pair of a checkbox and a label in the same group.
@@ -88,7 +87,10 @@ namespace dscv
 				//! Makes the group "streams"
 				void _make_grp_streams();
 
-				//! Makes the group "streams"
+				//! Initiates nana::listbox at the group "streams"
+				//!
+				//! Using STL containers shows much better performance.
+				//! http://nanapro.org/en-us/blog/2016/07/3-methods-to-insert-data-into-listbox/
 				void _make_grp_streams_lb();
 
 				enum class ListStreamsCategory : std::size_t
@@ -129,11 +131,8 @@ namespace dscv
 				};
 
 				nana::group grp_streams_{ *this, "", true };
+				nana::place plc_streams_{ grp_streams_ };
 
-				//! Listbox for the streams
-				//!
-				//! Using STL containers shows much better performance.
-				//! http://nanapro.org/en-us/blog/2016/07/3-methods-to-insert-data-into-listbox/
 				nana::listbox lb_streams_{ grp_streams_ };
 
 				nana::button btn_streams_add_{ grp_streams_ };
@@ -142,8 +141,7 @@ namespace dscv
 				nana::button btn_streams_move_up_{ grp_streams_, u8"\u2b06" };
 				nana::button btn_streams_move_down_{ grp_streams_, u8"\u2b07" };
 
-				nana::group grp_streams_extra_{ grp_streams_, "", true };
-				std::unique_ptr<StreamExtraPanelBase> panel_streams_extra_ptr_;
+				std::unique_ptr<StreamExtraGroupBase> grp_streams_extra_ptr_;
 
 				nana::group grp_judging_{ *this, "", true };
 
@@ -161,15 +159,19 @@ namespace dscv
 				nana::label label_comp_dont_ignore_consecutive_spaces_{ grp_comp_ };
 			};
 
-			class JudgeConfigPanel::StreamExtraPanelBase : public nana::panel<false>
+			class JudgeConfigPanel::StreamExtraGroupBase : public nana::group
 			{
 			public:
-				StreamExtraPanelBase() = delete;
-				StreamExtraPanelBase(nana::window wd, JudgeConfigPanel& config_panel);
+				StreamExtraGroupBase() = delete;
+				StreamExtraGroupBase(nana::window wd, JudgeConfigPanel& config_panel);
 
-				virtual ~StreamExtraPanelBase() = default;
+				virtual ~StreamExtraGroupBase() = default;
+
+				virtual void apply_i18n() = 0;
 
 			protected:
+				void _apply_i18n_styled(const std::string& str_translated);
+
 				JudgeConfigPanel& config_panel_ref_;
 
 				nana::place plc_{ *this };
@@ -185,21 +187,25 @@ namespace dscv
 				nana::button btn_cancel_{ *this };
 			};
 
-			class JudgeConfigPanel::StreamAdderPanel : public JudgeConfigPanel::StreamExtraPanelBase
+			class JudgeConfigPanel::StreamAdderGroup : public JudgeConfigPanel::StreamExtraGroupBase
 			{
 			public:
-				StreamAdderPanel() = delete;
-				StreamAdderPanel(nana::window wd, JudgeConfigPanel& config_panel);
+				StreamAdderGroup() = delete;
+				StreamAdderGroup(nana::window wd, JudgeConfigPanel& config_panel);
+
+				void apply_i18n() override;
 
 			private:
 				nana::button btn_add_{ *this };
 			};
 
-			class JudgeConfigPanel::StreamModifierPanel : public JudgeConfigPanel::StreamExtraPanelBase
+			class JudgeConfigPanel::StreamModifierGroup : public JudgeConfigPanel::StreamExtraGroupBase
 			{
 			public:
-				StreamModifierPanel() = delete;
-				StreamModifierPanel(nana::window wd, JudgeConfigPanel& config_panel);
+				StreamModifierGroup() = delete;
+				StreamModifierGroup(nana::window wd, JudgeConfigPanel& config_panel);
+
+				void apply_i18n() override;
 
 			private:
 				nana::button btn_modify_{ *this };
