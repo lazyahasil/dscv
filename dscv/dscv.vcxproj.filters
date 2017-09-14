@@ -123,6 +123,9 @@
     <ClCompile Include="gui\judge_page\judge_config_panel.cpp">
       <Filter>Source Files\gui\judge_page</Filter>
     </ClCompile>
+    <ClCompile Include="judge\judge_stream.cpp">
+      <Filter>Source Files\judge</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui.hpp">
@@ -167,9 +170,6 @@
     <ClInclude Include="gui\page_base.hpp">
       <Filter>Header Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="judge\judge_stream_info.hpp">
-      <Filter>Header Files\judge</Filter>
-    </ClInclude>
     <ClInclude Include="misc\make_array.hpp">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
@@ -205,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="gui\config_panel_base.hpp">
       <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="judge\judge_stream.hpp">
+      <Filter>Header Files\judge</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

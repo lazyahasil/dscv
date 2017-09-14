@@ -50,6 +50,17 @@ namespace dscv
 
 			void add_test_case();
 
+			bool add_text_stream(
+				judge::judge_stream::StreamType type,
+				std::size_t pos,
+				const std::string& filename
+			);
+
+			bool add_text_stream(
+				judge::judge_stream::StreamType type,
+				const std::string& filename
+			);
+
 			ConfigHandler::Ptree& options_ptree() noexcept;
 
 			std::size_t proper_height() const override;

@@ -2,7 +2,6 @@
 
 #include "config_gui_helper.hpp"
 #include "../judge/judge_file_writer.hpp"
-#include "../judge/judge_stream_info.hpp"
 
 #include <nana/gui/filebox.hpp>
 
@@ -145,6 +144,37 @@ namespace dscv
 			scroll_panel_refresh();
 		}
 
+		bool JudgePage::add_text_stream(
+			judge::judge_stream::StreamType type,
+			std::size_t pos,
+			const std::string& filename
+		)
+		{
+			for (const auto& wrapper : test_cases_)
+			{
+				auto& tc = wrapper->content();
+				auto result = tc.add_text_stream(type, pos, filename);
+				if (!result)
+					return false;
+			}
+			return true;
+		}
+
+		bool JudgePage::add_text_stream(
+			judge::judge_stream::StreamType type,
+			const std::string& filename
+		)
+		{
+			for (const auto& wrapper : test_cases_)
+			{
+				auto& tc = wrapper->content();
+				auto result = tc.add_text_stream(type, filename);
+				if (!result)
+					return false;
+			}
+			return true;
+		}
+
 		ConfigHandler::Ptree& JudgePage::options_ptree() noexcept
 		{
 			return ConfigHandler::subtree(judge_config_, judge_page::options::k_path_str);
@@ -193,7 +223,7 @@ namespace dscv
 
 		ConfigHandler::Ptree& JudgePage::streams_ptree() noexcept
 		{
-			return ConfigHandler::subtree(judge_config_, judge::judge_stream_info::k_path_str);
+			return ConfigHandler::subtree(judge_config_, judge::judge_stream::k_path_str);
 		}
 
 		void JudgePage::_clear_test_case_results()
@@ -208,11 +238,11 @@ namespace dscv
 		void JudgePage::_create_default_stream_info()
 		{
 			auto& ptree = streams_ptree();
-			ptree.put(judge_stream_info::k_has_stdin, true);
-			ptree.put(judge_stream_info::k_has_stdout, true);
-			ptree.put_child(judge_stream_info::k_array_in_files, ConfigHandler::Ptree{});
-			ptree.put_child(judge_stream_info::k_array_out_files, ConfigHandler::Ptree{});
-			ptree.put_child(judge_stream_info::k_array_inout_files, ConfigHandler::Ptree{});
+			ptree.put(judge_stream::k_has_stdin, true);
+			ptree.put(judge_stream::k_has_stdout, true);
+			ptree.put_child(judge_stream::k_array_in_files, ConfigHandler::Ptree{});
+			ptree.put_child(judge_stream::k_array_out_files, ConfigHandler::Ptree{});
+			ptree.put_child(judge_stream::k_array_inout_files, ConfigHandler::Ptree{});
 			// Write JSON
 			config_gui_helper::write_json_noexcept();
 		}
@@ -327,8 +357,8 @@ namespace dscv
 					throw std::runtime_error{ std::string{ "Cannot create a directory: " } +work_path.string() };
 
 				// Get ptrees of in and inout files
-				auto ptree_in_f = ConfigHandler::subtree(judge_config_, judge_stream_info::k_array_in_files);
-				auto ptree_inout_f = ConfigHandler::subtree(judge_config_, judge_stream_info::k_array_inout_files);
+				auto ptree_in_f = ConfigHandler::subtree(judge_config_, judge_stream::k_array_in_files);
+				auto ptree_inout_f = ConfigHandler::subtree(judge_config_, judge_stream::k_array_inout_files);
 
 				// Options
 				auto forced_endl_at_back
@@ -344,9 +374,9 @@ namespace dscv
 					std::size_t count = 0;
 					for (const auto& val : files_ptree)
 					{
-						auto media = val.second.get_optional<std::string>(judge_stream_info::file_info::k_media);
-						auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
-						if (!media || *media == judge_stream_info::file_media::k_text) // Text stream
+						auto media = val.second.get_optional<std::string>(judge_stream::file_info::k_media);
+						auto filename = val.second.get(judge_stream::file_info::k_name, "");
+						if (!media || *media == judge_stream::file_media::k_text) // Text stream
 						{
 							_write_text_file_for_judge(
 								dir_wstr + std::wstring(charset{ filename }),
@@ -417,11 +447,11 @@ namespace dscv
 			{
 				// If one of Ptree::get_value() or Ptree::get_child() fails, return true
 				const auto& ptree = streams_ptree();
-				auto has_stdin = ptree.get<bool>(judge_stream_info::k_has_stdin);
-				auto has_stdout = ptree.get<bool>(judge_stream_info::k_has_stdout);
-				const auto& ptree_in_f = ptree.get_child(judge_stream_info::k_array_in_files);
-				const auto& ptree_out_f = ptree.get_child(judge_stream_info::k_array_out_files);
-				const auto& ptree_inout_f = ptree.get_child(judge_stream_info::k_array_inout_files);
+				auto has_stdin = ptree.get<bool>(judge_stream::k_has_stdin);
+				auto has_stdout = ptree.get<bool>(judge_stream::k_has_stdout);
+				const auto& ptree_in_f = ptree.get_child(judge_stream::k_array_in_files);
+				const auto& ptree_out_f = ptree.get_child(judge_stream::k_array_out_files);
+				const auto& ptree_inout_f = ptree.get_child(judge_stream::k_array_inout_files);
 
 				// If there's no stream, return true
 				if (!has_stdin && !has_stdout && ptree_in_f.empty() && ptree_out_f.empty() && ptree_inout_f.empty())

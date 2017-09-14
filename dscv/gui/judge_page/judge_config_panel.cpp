@@ -2,7 +2,6 @@
 
 #include "../judge_page.hpp"
 #include "../config_gui_helper.hpp"
-#include "../../judge/judge_stream_info.hpp"
 
 #include <sstream>
 
@@ -198,7 +197,7 @@ namespace dscv
 				plc_streams_.div(
 					"vert margin=[25,10,10,10]"
 					"<lb_streams>"
-					"<weight=30 margin=[5,0,0,0]"
+					"<weight=30 margin=[5,0,0,0] stream_buttons"
 					"  <margin=[0,5,0,0] btn_add_stream>"
 					"  <margin=[0,5,0,0] btn_modify_stream>"
 					"  <margin=[0,5,0,0] btn_remove_stream>"
@@ -288,13 +287,13 @@ namespace dscv
 					std::vector<ListStreamsElement> console;
 					internationalization i18n;
 
-					auto has_stdin = streams_ptree_.get(judge_stream_info::k_has_stdin, false);
-					auto has_stdout = streams_ptree_.get(judge_stream_info::k_has_stdout, false);
+					auto has_stdin = streams_ptree_.get(judge_stream::k_has_stdin, false);
+					auto has_stdout = streams_ptree_.get(judge_stream::k_has_stdout, false);
 
 					if (has_stdin)
-						console.emplace_back(0, i18n("Console Input"), judge_stream_info::file_media::k_text);
+						console.emplace_back(0, i18n("Console Input"), judge_stream::file_media::k_text);
 					if (has_stdout)
-						console.emplace_back(0, i18n("Console Output"), judge_stream_info::file_media::k_text);
+						console.emplace_back(0, i18n("Console Output"), judge_stream::file_media::k_text);
 
 					lb_streams_.at(static_cast<std::size_t>(ListStreamsCategory::console))
 						.model<std::recursive_mutex>(std::move(console), val_translator, cell_translator);
@@ -313,10 +312,10 @@ namespace dscv
 
 						for (const auto& val : files_ptree)
 						{
-							auto media = val.second.get_optional<std::string>(judge_stream_info::file_info::k_media);
-							auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
+							auto media = val.second.get_optional<std::string>(judge_stream::file_info::k_media);
+							auto filename = val.second.get(judge_stream::file_info::k_name, "");
 							if (!media)
-								media = judge_stream_info::file_media::k_text;
+								media = judge_stream::file_media::k_text;
 							elements.emplace_back(count++, std::move(filename), std::move(*media));
 						}
 
@@ -326,15 +325,15 @@ namespace dscv
 
 					file_elements_generator(
 						static_cast<std::size_t>(ListStreamsCategory::in_files),
-						judge_stream_info::k_array_in_files
+						judge_stream::k_array_in_files
 					);
 					file_elements_generator(
 						static_cast<std::size_t>(ListStreamsCategory::out_files),
-						judge_stream_info::k_array_out_files
+						judge_stream::k_array_out_files
 					);
 					file_elements_generator(
 						static_cast<std::size_t>(ListStreamsCategory::inout_files),
-						judge_stream_info::k_array_inout_files
+						judge_stream::k_array_inout_files
 					);
 				}
 
@@ -373,7 +372,7 @@ namespace dscv
 					"<"
 					"  <weight=80 btn_cancel>"
 					"  <>"
-					"  <weight=80 btn_action>"
+					"  <weight=80 gap=4 btn_action>"
 					">"
 				);
 
@@ -395,6 +394,19 @@ namespace dscv
 				label_type_.text_align(align::left, align_v::center);
 				label_media_.text_align(align::left, align_v::center);
 				label_filename_.text_align(align::left, align_v::center);
+
+				internationalization i18n;
+
+				// Initiate combo_type_
+				combo_type_.push_back(i18n("Console Input"));
+				combo_type_.push_back(i18n("Console Output"));
+				combo_type_.push_back(i18n("Input File"));
+				combo_type_.push_back(i18n("Output File"));
+				combo_type_.push_back(i18n("I/O Hybrid File"));
+
+				// Initiate combo_media_
+				combo_media_.push_back(judge_stream::file_media::k_text);
+				combo_media_.option(static_cast<std::size_t>(judge_stream::FileMediaType::text));
 
 				// Set tb_filename_
 				tb_filename_.multi_lines(false);

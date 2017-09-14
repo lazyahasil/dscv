@@ -1,6 +1,5 @@
 ﻿#include "test_case_box.hpp"
 
-#include "../../judge/judge_stream_info.hpp"
 #include "../judge_page.hpp"
 
 #include <nana/gui/msgbox.hpp>
@@ -105,58 +104,71 @@ namespace dscv
 				btn_remove_case_.events().click(removal_func);
 			}
 
-			void TestCaseBox::add_text_stream_inout_file(std::size_t pos, const std::string& filename)
+			bool TestCaseBox::add_text_stream(
+				judge::judge_stream::StreamType type,
+				std::size_t pos,
+				const std::string& filename
+			)
 			{
-				_add_text_stream_file(inout_file_boxes_, pos,
-					std::make_unique<TestInOutStreamBox>(*this, filename, pos + 1));
+				using namespace judge_stream;
+
+				switch (type)
+				{
+				case StreamType::con_stdin:
+					return _add_text_stream_stdin();
+				case StreamType::con_stdout:
+					return _add_text_stream_stdout();
+				case StreamType::in_file:
+					{
+						auto new_box = std::make_unique<TestInStreamBox>(*this, filename, pos + 1);
+						if (!new_box)
+							return false;
+						_add_text_stream_file(in_file_boxes_, pos, std::move(new_box));
+					}
+					return true;
+				case StreamType::out_file:
+					{
+						auto new_box = std::make_unique<TestOutStreamBox>(*this, filename, pos + 1);
+						if (!new_box)
+							return false;
+						_add_text_stream_file(out_file_boxes_, pos, std::move(new_box));
+					}
+					return true;
+				case StreamType::inout_file:
+					{
+						auto new_box = std::make_unique<TestInOutStreamBox>(*this, filename, pos + 1);
+						if (!new_box)
+							return false;
+						_add_text_stream_file(inout_file_boxes_, pos, std::move(new_box));
+					}
+					return true;
+				}
+
+				return false;
 			}
 
-			void TestCaseBox::add_text_stream_in_file(std::size_t pos, const std::string& filename)
+			bool TestCaseBox::add_text_stream(
+				judge::judge_stream::StreamType type,
+				const std::string& filename
+			)
 			{
-				_add_text_stream_file(in_file_boxes_, pos,
-					std::make_unique<TestInStreamBox>(*this, filename, pos + 1));
-			}
+				using namespace judge_stream;
 
-			void TestCaseBox::add_text_stream_out_file(std::size_t pos, const std::string& filename)
-			{
-				_add_text_stream_file(out_file_boxes_, pos,
-					std::make_unique<TestOutStreamBox>(*this, filename, pos + 1));
-			}
+				switch (type)
+				{
+				case StreamType::con_stdin:
+					return _add_text_stream_stdin();
+				case StreamType::con_stdout:
+					return _add_text_stream_stdout();
+				case StreamType::in_file:
+					return add_text_stream(StreamType::in_file, in_file_boxes_.boxes.size(), filename);
+				case StreamType::out_file:
+					return add_text_stream(StreamType::out_file, out_file_boxes_.boxes.size(), filename);
+				case StreamType::inout_file:
+					return add_text_stream(StreamType::inout_file, inout_file_boxes_.boxes.size(), filename);
+				}
 
-			bool TestCaseBox::add_text_stream_stdin()
-			{
-				// Check if it already exists
-				if (stdin_box_)
-					return false;
-
-				stdin_box_ = std::make_unique<TestInStreamBox>(*this);
-				stdin_box_->i18n_name_label(i18n_eval{ "Console Input" });
-				stdin_box_->set_min_or_max_vert_scrolled_func(scroll_page_func_);
-
-				plc_["stdin_box"] << *stdin_box_;
-				plc_.field_display("stdin_box", true);
-
-				in_box_group_.height += 200;
-
-				return true;
-			}
-
-			bool TestCaseBox::add_text_stream_stdout()
-			{
-				// Check if it already exists
-				if (stdout_box_)
-					return false;
-
-				stdout_box_ = std::make_unique<TestOutStreamBox>(*this);
-				stdout_box_->i18n_name_label(i18n_eval{ "Console Output" });
-				stdout_box_->set_min_or_max_vert_scrolled_func(scroll_page_func_);
-
-				plc_["stdout_box"] << *stdout_box_;
-				plc_.field_display("stdout_box", true);
-
-				out_box_group_.height += 200;
-
-				return true;
+				return false;
 			}
 
 			void TestCaseBox::case_num(std::size_t num)
@@ -254,11 +266,11 @@ namespace dscv
 			void TestCaseBox::_add_text_stream_file(
 				FileBoxes& fbs,
 				std::size_t pos,
-				std::unique_ptr<TestStreamBoxBase>&& new_box
+				std::unique_ptr<TestStreamBoxBase> new_box
 			)
 			{
 				auto& cur = **fbs.boxes.insert(fbs.boxes.begin() + pos, std::move(new_box));
-				const auto len = fbs.boxes.size(); // Be careful of order to call std::vector<>::size()
+				const auto len = fbs.boxes.size(); // Be careful of the order of executions when getting the size
 
 				cur.set_min_or_max_vert_scrolled_func(scroll_page_func_);
 
@@ -290,38 +302,75 @@ namespace dscv
 				plc_.modify(fbs.place_str, weight_str.c_str());
 			}
 
+			bool TestCaseBox::_add_text_stream_stdin()
+			{
+				// Check if it already exists
+				if (stdin_box_)
+					return false;
+
+				stdin_box_ = std::make_unique<TestInStreamBox>(*this);
+				stdin_box_->i18n_name_label(i18n_eval{ "Console Input" });
+				stdin_box_->set_min_or_max_vert_scrolled_func(scroll_page_func_);
+
+				plc_["stdin_box"] << *stdin_box_;
+				plc_.field_display("stdin_box", true);
+
+				in_box_group_.height += 200;
+
+				return true;
+			}
+
+			bool TestCaseBox::_add_text_stream_stdout()
+			{
+				// Check if it already exists
+				if (stdout_box_)
+					return false;
+
+				stdout_box_ = std::make_unique<TestOutStreamBox>(*this);
+				stdout_box_->i18n_name_label(i18n_eval{ "Console Output" });
+				stdout_box_->set_min_or_max_vert_scrolled_func(scroll_page_func_);
+
+				plc_["stdout_box"] << *stdout_box_;
+				plc_.field_display("stdout_box", true);
+
+				out_box_group_.height += 200;
+
+				return true;
+			}
+
 			void TestCaseBox::_init_streams_from_info()
 			{
 				auto& ptree = page_ref_.streams_ptree();
 
-				auto has_stdin = ptree.get(judge_stream_info::k_has_stdin, false);
-				auto has_stdout = ptree.get(judge_stream_info::k_has_stdout, false);
-				auto& ptree_in_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_in_files);
-				auto& ptree_out_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_out_files);
-				auto& ptree_inout_f = ConfigHandler::subtree(ptree, judge_stream_info::k_array_inout_files);
+				auto has_stdin = ptree.get(judge_stream::k_has_stdin, false);
+				auto has_stdout = ptree.get(judge_stream::k_has_stdout, false);
 
 				if (has_stdin)
-					add_text_stream_stdin();
+					_add_text_stream_stdin();
 
 				if (has_stdout)
-					add_text_stream_stdout();
+					_add_text_stream_stdout();
 
-				auto lambda_get_files = [this](
-					const ConfigHandler::Ptree& files_ptree,
-					void(TestCaseBox::*text_adder)(const std::string&)
+				auto& ptree_in_f = ConfigHandler::subtree(ptree, judge_stream::k_array_in_files);
+				auto& ptree_out_f = ConfigHandler::subtree(ptree, judge_stream::k_array_out_files);
+				auto& ptree_inout_f = ConfigHandler::subtree(ptree, judge_stream::k_array_inout_files);
+
+				auto file_adder = [this](
+					judge_stream::StreamType file_type,
+					const ConfigHandler::Ptree& files_ptree
 					) {
 					for (const auto& val : files_ptree)
 					{
-						auto media = val.second.get_optional<std::string>(judge_stream_info::file_info::k_media);
-						auto filename = val.second.get(judge_stream_info::file_info::k_name, "");
-						if (!media || *media == judge_stream_info::file_media::k_text) // Text stream
-							(this->*text_adder)(filename);
+						auto media = val.second.get_optional<std::string>(judge_stream::file_info::k_media);
+						auto filename = val.second.get(judge_stream::file_info::k_name, "");
+						if (!media || *media == judge_stream::file_media::k_text) // Text stream
+							add_text_stream(file_type, filename);
 					}
 				};
 
-				lambda_get_files(ptree_in_f, &TestCaseBox::add_text_stream_in_file);
-				lambda_get_files(ptree_out_f, &TestCaseBox::add_text_stream_out_file);
-				lambda_get_files(ptree_inout_f, &TestCaseBox::add_text_stream_inout_file);
+				file_adder(judge_stream::StreamType::in_file, ptree_in_f);
+				file_adder(judge_stream::StreamType::out_file, ptree_out_f);
+				file_adder(judge_stream::StreamType::inout_file, ptree_inout_f);
 			}
 		}
 	}

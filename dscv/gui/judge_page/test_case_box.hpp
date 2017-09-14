@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "../../judge/judge_stream.hpp"
 #include "../page_base.hpp"
 #include "test_stream_box.hpp"
 
@@ -39,30 +40,16 @@ namespace dscv
 				TestCaseBox() = delete;
 				TestCaseBox(nana::window wd, JudgePage& page, std::size_t num);
 
-				void add_text_stream_inout_file(std::size_t pos, const std::string& filename);
+				bool add_text_stream(
+					judge::judge_stream::StreamType type,
+					std::size_t pos,
+					const std::string& filename
+				);
 
-				void add_text_stream_inout_file(const std::string& filename)
-				{
-					add_text_stream_inout_file(inout_file_boxes_.boxes.size(), filename);
-				}
-
-				void add_text_stream_in_file(std::size_t pos, const std::string& filename);
-
-				void add_text_stream_in_file(const std::string& filename)
-				{
-					add_text_stream_in_file(in_file_boxes_.boxes.size(), filename);
-				}
-
-				void add_text_stream_out_file(std::size_t pos, const std::string& filename);
-
-				void add_text_stream_out_file(const std::string& filename)
-				{
-					add_text_stream_out_file(out_file_boxes_.boxes.size(), filename);
-				}
-
-				bool add_text_stream_stdin();
-
-				bool add_text_stream_stdout();
+				bool add_text_stream(
+					judge::judge_stream::StreamType type,
+					const std::string& filename
+				);
 
 				bool stream_boxes_empty()
 				{
@@ -133,8 +120,12 @@ namespace dscv
 
 			private:
 				void _add_text_stream_file(
-					FileBoxes& fb, std::size_t pos, std::unique_ptr<TestStreamBoxBase>&& new_box
+					FileBoxes& fb, std::size_t pos, std::unique_ptr<TestStreamBoxBase> new_box
 				);
+
+				bool _add_text_stream_stdin();
+
+				bool _add_text_stream_stdout();
 
 				void _init_streams_from_info();
 
