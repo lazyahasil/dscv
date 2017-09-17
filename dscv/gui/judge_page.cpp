@@ -125,6 +125,13 @@ namespace dscv
 			});
 		}
 
+		void JudgePage::adapt_height_of_test_cases()
+		{
+			for (auto& wrap_ptr : test_cases_)
+				wrap_ptr->fix_content_height(wrap_ptr->content().proper_height());
+			scroll_panel_refresh();
+		}
+
 		void JudgePage::add_test_case()
 		{
 			std::lock_guard<std::recursive_mutex> g(test_cases_mutex_);
@@ -150,9 +157,9 @@ namespace dscv
 			const std::string& filename
 		)
 		{
-			for (const auto& wrapper : test_cases_)
+			for (const auto& wrap_ptr : test_cases_)
 			{
-				auto& tc = wrapper->content();
+				auto& tc = wrap_ptr->content();
 				auto result = tc.add_text_stream(type, pos, filename);
 				if (!result)
 					return false;
@@ -165,12 +172,13 @@ namespace dscv
 			const std::string& filename
 		)
 		{
-			for (const auto& wrapper : test_cases_)
+			for (const auto& wrap_ptr : test_cases_)
 			{
-				auto& tc = wrapper->content();
+				auto& tc = wrap_ptr->content();
 				auto result = tc.add_text_stream(type, filename);
 				if (!result)
 					return false;
+				tc.collocate();
 			}
 			return true;
 		}
@@ -228,9 +236,9 @@ namespace dscv
 
 		void JudgePage::_clear_test_case_results()
 		{
-			for (const auto& wrapper : test_cases_)
+			for (const auto& wrap_ptr : test_cases_)
 			{
-				auto& tc = wrapper->content();
+				auto& tc = wrap_ptr->content();
 				tc.clear_results_and_log();
 			}
 		}
@@ -306,8 +314,8 @@ namespace dscv
 			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::system_clock::now() - judge_started_time_);
 
-			for (auto& wrapper : test_cases_)
-				wrapper->content().handle_judging_error(elapsed_time, err_msg);
+			for (auto& wrap_ptr : test_cases_)
+				wrap_ptr->content().handle_judging_error(elapsed_time, err_msg);
 		}
 
 		void JudgePage::_propagate_judging_error(std::size_t case_num, const std::string& err_msg)
@@ -395,9 +403,9 @@ namespace dscv
 				});
 				process_wptr_ = process; // Bind a std::weak_ptr
 
-				for (const auto& wrapper : test_cases_)
+				for (const auto& wrap_ptr : test_cases_)
 				{
-					auto& tc = wrapper->content();
+					auto& tc = wrap_ptr->content();
 					auto dir = work_path / std::to_wstring(tc.case_num());
 
 					if (!fs::exists(dir) && !fs::create_directories(dir))

@@ -32,6 +32,7 @@ namespace dscv
 			{
 				constexpr std::size_t k_scrollbar_weight = 16;
 
+				bool check_if_vert_fully_shown(const nana::textbox& tb);
 				bool check_if_max_vert_scrolled(const nana::textbox& tb);
 				bool check_if_min_vert_scrolled(const nana::textbox& tb);
 				void make_scroll(nana::textbox& tb, bool is_forward, bool is_horz);

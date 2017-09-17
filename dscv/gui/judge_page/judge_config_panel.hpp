@@ -58,6 +58,13 @@ namespace dscv
 				//! Applies i18n to all the group.
 				void apply_i18n() override;
 
+				JudgePage& page() noexcept
+				{
+					return page_ref_;
+				}
+
+				void remove_stream_extra_group();
+
 			private:
 				//! Initiates a option pair of a checkbox and a label in the same group.
 				//!
@@ -109,6 +116,7 @@ namespace dscv
 					media
 				};
 
+				JudgePage& page_ref_;
 				ConfigHandler::Ptree& options_ptree_;
 				ConfigHandler::Ptree& streams_ptree_;
 

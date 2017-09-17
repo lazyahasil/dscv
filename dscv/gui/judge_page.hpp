@@ -48,6 +48,8 @@ namespace dscv
 
 			explicit JudgePage(const std::string& name) : JudgePage(nullptr, name) { }
 
+			void adapt_height_of_test_cases();
+
 			void add_test_case();
 
 			bool add_text_stream(

@@ -36,13 +36,21 @@ namespace dscv
 		{
 			namespace hack_textbox
 			{
+				bool check_if_vert_fully_shown(const nana::textbox& tb)
+				{
+					const auto cvimpl = tb.editor()->cview()->impl();
+					const auto content_height = cvimpl->content_size.height;
+					const auto disp_height = cvimpl->disp_area.height;
+					return content_height <= disp_height;
+				}
+
 				bool check_if_max_vert_scrolled(const nana::textbox& tb)
 				{
 					const auto cvimpl = tb.editor()->cview()->impl();
 					auto val = cvimpl->vert.value();
 					if (val < k_scrollbar_weight)
 						val = 0;
-					auto max = cvimpl->content_size.height;
+					const auto max = cvimpl->content_size.height;
 					const auto disp_height = cvimpl->disp_area.height;
 					if (max <= disp_height)
 						return true;

@@ -55,18 +55,31 @@ namespace dscv
 			});
 
 			textbox_.events().mouse_wheel([this](const arg_wheel& arg) {
-				// Beware that the mouse wheel does effect even if not focused
+				// Beware that the mouse wheel affects even if not focused
+				using namespace detail::hack_textbox;
+
 				API::refresh_window_tree(*this);
+
 				if (!min_or_max_vert_scrolled_func_)
 					return;
+
 				if (arg.upwards)
 				{
-					if (detail::hack_textbox::check_if_min_vert_scrolled(textbox_))
+					if (!is_min_vert_scrolled_before_ && !check_if_vert_fully_shown(textbox_))
+						is_min_vert_scrolled_before_ = true;
+					else if (check_if_min_vert_scrolled(textbox_))
 						min_or_max_vert_scrolled_func_(true);
+					else
+						is_min_vert_scrolled_before_ = false;
 				}
-				else if (detail::hack_textbox::check_if_max_vert_scrolled(textbox_))
+				else
 				{
-					min_or_max_vert_scrolled_func_(false);
+					if (!is_max_vert_scrolled_before_ && !check_if_vert_fully_shown(textbox_))
+						is_max_vert_scrolled_before_ = true;
+					else if (check_if_max_vert_scrolled(textbox_))
+						min_or_max_vert_scrolled_func_(false);
+					else
+						is_max_vert_scrolled_before_ = false;
 				}
 			});
 

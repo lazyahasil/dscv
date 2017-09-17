@@ -88,7 +88,7 @@ namespace dscv
 				// Initiate stream boxes
 				_init_streams_from_info();
 
-				auto removal_func = [this] {
+				btn_remove_case_.events().click([this] {
 					// Show a msgbox if not empty
 					if (!stream_cases_empty())
 					{
@@ -99,9 +99,7 @@ namespace dscv
 							return;
 					}
 					page_ref_.remove_test_case(case_num_ - 1);
-				};
-
-				btn_remove_case_.events().click(removal_func);
+				});
 			}
 
 			bool TestCaseBox::add_text_stream(
@@ -293,9 +291,16 @@ namespace dscv
 				if (len == 1)
 					plc_.field_display(fbs.place_str, true);
 
+				// Set height
+				std::size_t box_height;
+				if (fbs.place_str != inout_file_boxes_.place_str)
+					box_height = 200;
+				else
+					box_height = 350;
+
 				// Add height
-				fbs.height += 200;
-				fbs.box_group.height += 200;
+				fbs.height += box_height;
+				fbs.box_group.height += box_height;
 
 				// Set the whole height of boxes
 				const auto weight_str = std::string("weight=") + std::to_string(fbs.height);

@@ -16,7 +16,10 @@ namespace dscv
 		namespace judge_page
 		{
 			JudgeConfigPanel::JudgeConfigPanel(nana::window wd, JudgePage& page)
-				: ConfigPanelBase(wd), options_ptree_(page.options_ptree()), streams_ptree_(page.streams_ptree())
+				: ConfigPanelBase(wd),
+				  page_ref_(page),
+				  options_ptree_(page.options_ptree()),
+				  streams_ptree_(page.streams_ptree())
 			{
 				plc_.div(
 					"margin=5"
@@ -81,6 +84,13 @@ namespace dscv
 
 				if (grp_streams_extra_ptr_)
 					grp_streams_extra_ptr_->apply_i18n();
+			}
+
+			void JudgeConfigPanel::remove_stream_extra_group()
+			{
+				plc_streams_.field_display("grp_streams_extra", false);
+				plc_streams_.collocate();
+				grp_streams_extra_ptr_.reset();
 			}
 
 			void JudgeConfigPanel::_init_checkbox_and_label(
@@ -410,6 +420,11 @@ namespace dscv
 
 				// Set tb_filename_
 				tb_filename_.multi_lines(false);
+
+				// Make the cancellation event
+				btn_cancel_.events().click([this] {
+					config_panel_ref_.remove_stream_extra_group();
+				});
 			}
 
 			void JudgeConfigPanel::StreamExtraGroupBase::_apply_i18n_styled(const std::string& str_translated)
@@ -432,6 +447,22 @@ namespace dscv
 				btn_add_.i18n(i18n_eval{ "Add" });
 
 				plc_.collocate();
+
+				btn_add_.events().click([this] {
+					// If the media is "text"
+					if (combo_media_.option() == static_cast<std::size_t>(judge_stream::FileMediaType::text))
+					{
+						config_panel_ref_.page().add_text_stream(
+							static_cast<judge_stream::StreamType>(combo_type_.option()),
+							tb_filename_.caption()
+						);
+						config_panel_ref_.page().adapt_height_of_test_cases();
+
+						// property_tree addition needed
+
+						config_panel_ref_.remove_stream_extra_group();
+					}
+				});
 			}
 
 			void JudgeConfigPanel::StreamAdderGroup::apply_i18n()

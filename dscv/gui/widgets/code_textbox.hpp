@@ -8,6 +8,7 @@
 #include <nana/gui/widgets/panel.hpp>
 #include <nana/gui/widgets/textbox.hpp>
 
+#include <atomic>
 #include <mutex>
 
 namespace dscv
@@ -115,6 +116,9 @@ namespace dscv
 			nana::color line_num_panel_bgcolor_{ detail::code_textbox::k_default_line_num_bgcolor };
 
 			std::function<void(bool)> min_or_max_vert_scrolled_func_;
+			std::atomic<bool> is_min_vert_scrolled_before_;
+			std::atomic<bool> is_max_vert_scrolled_before_;
+
 			std::function<nana::color(std::size_t)> line_num_bgcolor_func_{ [&](std::size_t) {
 				return detail::code_textbox::k_default_line_num_bgcolor;
 			} };
